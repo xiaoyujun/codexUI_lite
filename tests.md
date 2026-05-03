@@ -4206,6 +4206,37 @@ Project rows open the same action menu from right-click and the dots button, and
 
 ---
 
+### Sidebar project archive all chats action
+
+#### Feature/Change Name
+Project action menus can archive all chats in that project with one menu action.
+
+#### Prerequisites/Setup
+1. Dev server running (`pnpm run dev`)
+2. Sidebar contains a disposable project with at least two disposable chats
+3. At least one disposable chat in that project is pinned, if pinned-state cleanup needs verification
+4. Light theme and dark theme are available from the appearance switcher
+
+#### Steps
+1. In light theme, open the disposable project row dots menu.
+2. Verify the menu includes `Archive all chats`.
+3. Click `Archive all chats`.
+4. Confirm every chat from that project disappears from the project section immediately.
+5. Confirm any pinned chats from that project also disappear from `Pinned`.
+6. If the selected chat belonged to the archived project, confirm the app switches to the next available unarchived chat or the home screen.
+7. Switch to dark theme and repeat steps 1 through 6 with another disposable project.
+
+#### Expected Results
+- `Archive all chats` appears only when the project has visible archiveable chats.
+- Clicking it archives all chats from that project, including pinned chats, through the existing archive behavior.
+- The project menu remains readable in both light and dark themes.
+- Current-thread selection never lands on a thread that was just archived.
+
+#### Rollback/Cleanup
+- Use only disposable chats/projects for this verification because archived chats are removed from the active sidebar.
+
+---
+
 ### Sidebar thread inline delete confirmation and menu pin action
 
 #### Feature/Change Name

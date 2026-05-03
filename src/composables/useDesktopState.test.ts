@@ -4,6 +4,7 @@ import {
   collectWorkspaceRootPathsForProjectRemoval,
   filterGroupsByWorkspaceRoots,
   findAdjacentThreadId,
+  findAdjacentThreadIdExcluding,
 } from './useDesktopState'
 import type { UiProjectGroup } from '../types/codex'
 import type { WorkspaceRootsState } from '../api/codexGateway'
@@ -281,5 +282,41 @@ describe('findAdjacentThreadId', () => {
 
   it('returns no fallback when there is no adjacent thread', () => {
     expect(findAdjacentThreadId([thread('selected-thread', '/tmp/project')], 'selected-thread')).toBe('')
+  })
+})
+
+describe('findAdjacentThreadIdExcluding', () => {
+  it('skips every archived project thread when choosing the next selection', () => {
+    const threads = [
+      thread('previous-thread', '/tmp/previous'),
+      thread('selected-thread', '/tmp/project'),
+      thread('archived-next-thread', '/tmp/project'),
+      thread('outside-next-thread', '/tmp/outside'),
+    ]
+
+    expect(findAdjacentThreadIdExcluding(threads, 'selected-thread', ['selected-thread', 'archived-next-thread'])).toBe(
+      'outside-next-thread',
+    )
+  })
+
+  it('falls back to an earlier unarchived thread when later threads are archived', () => {
+    const threads = [
+      thread('outside-previous-thread', '/tmp/outside'),
+      thread('selected-thread', '/tmp/project'),
+      thread('archived-next-thread', '/tmp/project'),
+    ]
+
+    expect(findAdjacentThreadIdExcluding(threads, 'selected-thread', ['selected-thread', 'archived-next-thread'])).toBe(
+      'outside-previous-thread',
+    )
+  })
+
+  it('returns no fallback when all adjacent threads are archived', () => {
+    const threads = [
+      thread('selected-thread', '/tmp/project'),
+      thread('archived-next-thread', '/tmp/project'),
+    ]
+
+    expect(findAdjacentThreadIdExcluding(threads, 'selected-thread', ['selected-thread', 'archived-next-thread'])).toBe('')
   })
 })

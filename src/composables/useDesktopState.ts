@@ -64,9 +64,26 @@ function flattenThreads(groups: UiProjectGroup[]): UiThread[] {
 }
 
 export function findAdjacentThreadId(threads: UiThread[], threadId: string): string {
+  return findAdjacentThreadIdExcluding(threads, threadId, [threadId])
+}
+
+export function findAdjacentThreadIdExcluding(
+  threads: UiThread[],
+  threadId: string,
+  excludedThreadIds: Iterable<string>,
+): string {
   const targetIndex = threads.findIndex((thread) => thread.id === threadId)
   if (targetIndex < 0) return ''
-  return threads[targetIndex + 1]?.id ?? threads[targetIndex - 1]?.id ?? ''
+  const excluded = new Set(excludedThreadIds)
+  for (let index = targetIndex + 1; index < threads.length; index += 1) {
+    const nextThreadId = threads[index]?.id ?? ''
+    if (nextThreadId && !excluded.has(nextThreadId)) return nextThreadId
+  }
+  for (let index = targetIndex - 1; index >= 0; index -= 1) {
+    const previousThreadId = threads[index]?.id ?? ''
+    if (previousThreadId && !excluded.has(previousThreadId)) return previousThreadId
+  }
+  return ''
 }
 
 const READ_STATE_STORAGE_KEY = 'codex-web-local.thread-read-state.v1'
@@ -4283,7 +4300,7 @@ export function useDesktopState() {
   async function archiveThreadById(threadId: string) {
     const wasSelectedThread = selectedThreadId.value === threadId
     const nextSelectedThreadId = wasSelectedThread
-      ? findAdjacentThreadId(flattenThreads(projectGroups.value), threadId)
+      ? findAdjacentThreadIdExcluding(flattenThreads(projectGroups.value), threadId, [threadId])
       : ''
 
     if (wasSelectedThread) {
@@ -4299,6 +4316,43 @@ export function useDesktopState() {
 
       if (wasSelectedThread && nextSelectedThreadId && selectedThreadId.value === nextSelectedThreadId) {
         await ensureThreadMessagesLoaded(nextSelectedThreadId, { silent: true })
+      }
+    } catch (unknownError) {
+      error.value = unknownError instanceof Error ? unknownError.message : 'Unknown application error'
+    }
+  }
+
+  async function archiveThreadsById(threadIds: string[]) {
+    const uniqueThreadIds = threadIds
+      .map((threadId) => threadId.trim())
+      .filter((threadId, index, rows) => threadId.length > 0 && rows.indexOf(threadId) === index)
+    if (uniqueThreadIds.length === 0) return
+
+    const archivedThreadIdSet = new Set(uniqueThreadIds)
+    const currentSelectedThreadId = selectedThreadId.value
+    const wasSelectedThread = archivedThreadIdSet.has(currentSelectedThreadId)
+    const nextSelectedThreadId = wasSelectedThread
+      ? findAdjacentThreadIdExcluding(flattenThreads(projectGroups.value), currentSelectedThreadId, archivedThreadIdSet)
+      : ''
+
+    if (wasSelectedThread) {
+      setSelectedThreadId(nextSelectedThreadId)
+      if (nextSelectedThreadId) {
+        void loadMessages(nextSelectedThreadId, { silent: true })
+      }
+    }
+
+    try {
+      const results = await Promise.allSettled(uniqueThreadIds.map((threadId) => archiveThread(threadId)))
+      await loadThreads()
+
+      if (wasSelectedThread && nextSelectedThreadId && selectedThreadId.value === nextSelectedThreadId) {
+        await ensureThreadMessagesLoaded(nextSelectedThreadId, { silent: true })
+      }
+
+      const failedCount = results.filter((result) => result.status === 'rejected').length
+      if (failedCount > 0) {
+        error.value = `Failed to archive ${failedCount} of ${uniqueThreadIds.length} threads`
       }
     } catch (unknownError) {
       error.value = unknownError instanceof Error ? unknownError.message : 'Unknown application error'
@@ -5310,6 +5364,7 @@ export function useDesktopState() {
     setThreadTerminalOpen,
     toggleSelectedThreadTerminal,
     archiveThreadById,
+    archiveThreadsById,
     renameThreadById,
     forkThreadById,
     forkThreadFromTurn,

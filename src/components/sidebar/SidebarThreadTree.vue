@@ -328,6 +328,14 @@
                         Rename project
                       </button>
                       <button
+                        v-if="getProjectArchiveThreadCount(group.projectName) > 0"
+                        class="project-menu-item"
+                        type="button"
+                        @click="onArchiveProject(group.projectName)"
+                      >
+                        Archive all chats
+                      </button>
+                      <button
                         class="project-menu-item project-menu-item-danger"
                         type="button"
                         @click="onRemoveProject(group.projectName)"
@@ -753,6 +761,7 @@ const { t } = useUiLanguage()
 const emit = defineEmits<{
   select: [threadId: string]
   archive: [threadId: string]
+  'archive-project': [payload: { projectName: string; threadIds: string[] }]
   'start-new-thread': [projectName: string]
   'browse-thread-files': [threadId: string]
   'browse-project-files': [projectName: string]
@@ -1378,21 +1387,70 @@ function onInlineDeleteClick(threadId: string): void {
   inlineDeleteConfirmThreadId.value = ''
 }
 
-function deleteThreadById(threadId: string): void {
-  if (!optimisticallyArchivedThreadIdSet.value.has(threadId)) {
-    optimisticallyArchivedThreadIds.value = [threadId, ...optimisticallyArchivedThreadIds.value]
+function addOptimisticallyArchivedThreadIds(threadIds: string[]): void {
+  const nextThreadIds = [...threadIds, ...optimisticallyArchivedThreadIds.value]
+  const seenThreadIds = new Set<string>()
+  optimisticallyArchivedThreadIds.value = nextThreadIds.filter((threadId) => {
+    const normalizedThreadId = threadId.trim()
+    if (!normalizedThreadId || seenThreadIds.has(normalizedThreadId)) return false
+    seenThreadIds.add(normalizedThreadId)
+    return true
+  })
+}
+
+function unpinArchivedThreadIds(threadIds: string[]): void {
+  const archivedThreadIdSet = new Set(threadIds)
+  pinnedThreadIds.value = pinnedThreadIds.value.filter((id) => !archivedThreadIdSet.has(id))
+}
+
+function removeAutomationsForArchivedThreadIds(threadIds: string[]): void {
+  const archivedThreadIdSet = new Set(threadIds)
+  const archivedAutomationThreadIds = Object.keys(automationByThreadId.value).filter((threadId) => archivedThreadIdSet.has(threadId))
+  if (archivedAutomationThreadIds.length === 0) return
+
+  for (const threadId of archivedAutomationThreadIds) {
+    void deleteThreadAutomation(threadId).catch(() => undefined)
   }
+  automationByThreadId.value = Object.fromEntries(
+    Object.entries(automationByThreadId.value).filter(([id]) => !archivedThreadIdSet.has(id)),
+  )
+}
+
+function deleteThreadById(threadId: string): void {
+  addOptimisticallyArchivedThreadIds([threadId])
   inlineDeleteConfirmThreadId.value = ''
   closeThreadMenu()
-  pinnedThreadIds.value = pinnedThreadIds.value.filter((id) => id !== threadId)
+  unpinArchivedThreadIds([threadId])
   emit('archive', threadId)
+  removeAutomationsForArchivedThreadIds([threadId])
+}
 
-  if (threadHasAutomation(threadId)) {
-    void deleteThreadAutomation(threadId).catch(() => undefined)
-    automationByThreadId.value = Object.fromEntries(
-      Object.entries(automationByThreadId.value).filter(([id]) => id !== threadId),
-    )
+function getProjectArchiveThreadIds(projectName: string): string[] {
+  const group = props.groups.find((row) => row.projectName === projectName)
+  if (!group) return []
+
+  return group.threads
+    .filter((thread) => !isProjectlessChatPath(thread.cwd) && !optimisticallyArchivedThreadIdSet.value.has(thread.id))
+    .map((thread) => thread.id)
+    .filter((threadId, index, rows) => threadId.length > 0 && rows.indexOf(threadId) === index)
+}
+
+function getProjectArchiveThreadCount(projectName: string): number {
+  return getProjectArchiveThreadIds(projectName).length
+}
+
+function onArchiveProject(projectName: string): void {
+  const threadIds = getProjectArchiveThreadIds(projectName)
+  if (threadIds.length === 0) {
+    closeProjectMenu()
+    return
   }
+
+  addOptimisticallyArchivedThreadIds(threadIds)
+  unpinArchivedThreadIds(threadIds)
+  removeAutomationsForArchivedThreadIds(threadIds)
+  emit('archive-project', { projectName, threadIds })
+  closeProjectMenu()
 }
 
 function openAutomationDialog(threadId: string): void {
@@ -1736,7 +1794,7 @@ function updateProjectMenuDirection(projectName: string): void {
 
   projectMenuDirectionById.value = {
     ...projectMenuDirectionById.value,
-    [projectName]: resolveMenuDirection(menuWrapElement, 176),
+    [projectName]: resolveMenuDirection(menuWrapElement, 216),
   }
 }
 

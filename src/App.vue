@@ -68,7 +68,7 @@
             :search-matched-thread-ids="serverMatchedThreadIds"
             :filter-active="isSidebarSearchVisible"
             @select="onSelectThread"
-            @archive="onArchiveThread" @start-new-thread="onStartNewThread" @rename-project="onRenameProject"
+            @archive="onArchiveThread" @archive-project="onArchiveProjectThreads" @start-new-thread="onStartNewThread" @rename-project="onRenameProject"
             @browse-thread-files="onBrowseThreadFiles"
             @browse-project-files="onBrowseProjectFiles"
             @create-project-worktree="onCreateProjectWorktree"
@@ -1212,6 +1212,7 @@ const {
   setThreadTerminalOpen,
   toggleSelectedThreadTerminal,
   archiveThreadById,
+  archiveThreadsById,
   forkThreadById,
   renameThreadById,
   forkThreadFromTurn,
@@ -2270,6 +2271,10 @@ async function onRemoveAccount(accountId: string): Promise<void> {
 
 function onArchiveThread(threadId: string): void {
   void archiveThreadById(threadId)
+}
+
+function onArchiveProjectThreads(payload: { threadIds: string[] }): void {
+  void archiveThreadsById(payload.threadIds)
 }
 
 async function onForkThread(threadId: string): Promise<void> {
