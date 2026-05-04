@@ -11,6 +11,7 @@ The current implementation optimizes both enough for browser delivery: unchanged
 
 Sources:
 - [Realtime chat rendering and inline media notes](../../raw/features/realtime-chat-rendering-inline-media.md)
+- [Command tested tags source](../../raw/features/command-tested-tags.md)
 - [Integrated terminal source](../../raw/features/integrated-terminal.md)
 
 ## Frontend Rendering Model
@@ -48,6 +49,14 @@ The bridge should not send those strings directly to the browser. Instead, threa
 
 This is a read-path/UI-payload optimization. It does not compact historical JSONL files on disk.
 
+## Command Row Tags
+
+Completed command rows can carry a local UI-only tested tag. The tag is toggled from a command-row right-click menu and is persisted in browser local storage under `codex-web-local.command-tested-tags.v1`.
+
+The tag state is scoped by active thread id and command message id. In-progress commands do not expose the tested context menu.
+
+The command context menu and existing file-link context menu use the UI language helper, so their labels update when the interface switches between English and Simplified Chinese.
+
 ## Verification Notes
 
 Use `scripts/profile-testchat-realtime.cjs` for realtime rendering checks and `scripts/profile-browser-runtime.cjs` for startup/large-thread profiles.
@@ -59,3 +68,4 @@ Useful assertions:
 - file links still render with correct href/title/text
 - large image-heavy threads render images through `/codex-local-image`, not `data:` URLs
 - `thread/resume` payloads stay bounded even when raw JSONL files are tens of MB
+- command tested tags persist after refresh and remain readable in light and dark themes

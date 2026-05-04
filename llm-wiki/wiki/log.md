@@ -1,5 +1,11 @@
 # Log
 
+## [2026-05-04] ingest | command tested tags
+- Added source: `raw/features/command-tested-tags.md`.
+- Updated wiki page: `concepts/realtime-chat-rendering.md`.
+- Documents: completed command right-click tested tags, localStorage persistence key, language-aware context menu labels, and dark-theme coverage.
+- Updated `index.md`.
+
 ## [2026-05-04] ingest | cc-switch Codex provider model picker
 - Added source: `raw/features/cc-switch-codex-provider-models.md`.
 - Created wiki page: `concepts/cc-switch-codex-provider-models.md`.

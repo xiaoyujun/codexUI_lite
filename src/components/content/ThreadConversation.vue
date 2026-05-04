@@ -62,9 +62,11 @@
                       },
                     ]"
                     @click="toggleCommandExpand(cmd)"
+                    @contextmenu.prevent.stop="onCommandRowContextMenu($event, cmd)"
                   >
                     <span class="cmd-chevron" :class="{ 'cmd-chevron-open': isCommandExpanded(cmd) }">▶</span>
                     <code class="cmd-label">{{ cmd.commandExecution?.command || '(command)' }}</code>
+                    <span v-if="isCommandTested(cmd)" class="cmd-tested-badge">{{ t('Tested') }}</span>
                     <span class="cmd-status">{{ commandStatusLabel(cmd) }}</span>
                   </button>
                   <div
@@ -94,9 +96,11 @@
                   },
                 ]"
                 @click="toggleCommandExpand(message)"
+                @contextmenu.prevent.stop="onCommandRowContextMenu($event, message)"
               >
                 <span class="cmd-chevron" :class="{ 'cmd-chevron-open': isCommandExpanded(message) }">▶</span>
                 <code class="cmd-label">{{ message.commandExecution?.command || '(command)' }}</code>
+                <span v-if="isCommandTested(message)" class="cmd-tested-badge">{{ t('Tested') }}</span>
                 <span class="cmd-status">{{ commandStatusLabel(message) }}</span>
               </button>
               <div
@@ -255,9 +259,11 @@
                           },
                         ]"
                         @click="toggleCommandExpand(cmd)"
+                        @contextmenu.prevent.stop="onCommandRowContextMenu($event, cmd)"
                       >
                         <span class="cmd-chevron" :class="{ 'cmd-chevron-open': isCommandExpanded(cmd) }">▶</span>
                         <code class="cmd-label">{{ cmd.commandExecution?.command || '(command)' }}</code>
+                        <span v-if="isCommandTested(cmd)" class="cmd-tested-badge">{{ t('Tested') }}</span>
                         <span class="cmd-status">{{ commandStatusLabel(cmd) }}</span>
                       </button>
                       <div
@@ -716,10 +722,10 @@
       @click.stop
     >
       <button type="button" class="file-link-context-menu-item" @click="openFileLinkContextBrowse">
-        Open link
+        {{ t('Open link') }}
       </button>
       <button type="button" class="file-link-context-menu-item" @click="copyFileLinkContextLink">
-        Copy link
+        {{ t('Copy link') }}
       </button>
       <button
         v-if="fileLinkContextEditUrl"
@@ -727,7 +733,22 @@
         class="file-link-context-menu-item"
         @click="openFileLinkContextEdit"
       >
-        Edit file
+        {{ t('Edit file') }}
+      </button>
+    </div>
+
+    <div
+      v-if="isCommandContextMenuVisible"
+      ref="commandContextMenuRef"
+      class="file-link-context-menu command-context-menu"
+      :style="commandContextMenuStyle"
+      @click.stop
+    >
+      <button type="button" class="file-link-context-menu-item command-context-menu-item" @click="toggleCommandTestedFromMenu">
+        <span class="command-context-checkbox" :data-checked="isCommandContextTargetTested ? 'true' : 'false'">
+          <span v-if="isCommandContextTargetTested" aria-hidden="true">✓</span>
+        </span>
+        <span>{{ t('Tested') }}</span>
       </button>
     </div>
 
@@ -854,6 +875,7 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import type { UiFileChange, UiLiveOverlay, UiMessage, UiPlanStep, UiServerRequest } from '../../types/codex'
 import { useMobile } from '../../composables/useMobile'
+import { useUiLanguage } from '../../composables/useUiLanguage'
 
 import IconTablerArrowUp from '../icons/IconTablerArrowUp.vue'
 import IconTablerCopy from '../icons/IconTablerCopy.vue'
@@ -871,13 +893,21 @@ const expandedFileChangeSummaryIds = ref<Set<string>>(new Set())
 const activeDiffViewerSummary = ref<TurnFileChangeSummary | null>(null)
 const activeDiffViewerChangeKey = ref('')
 const isDiffViewerFileListOpen = ref(false)
+const TESTED_COMMAND_STORAGE_KEY = 'codex-web-local.command-tested-tags.v1'
 const fileLinkContextMenuRef = ref<HTMLElement | null>(null)
 const isFileLinkContextMenuVisible = ref(false)
 const fileLinkContextMenuX = ref(0)
 const fileLinkContextMenuY = ref(0)
 const fileLinkContextBrowseUrl = ref('')
 const fileLinkContextEditUrl = ref('')
+const commandContextMenuRef = ref<HTMLElement | null>(null)
+const isCommandContextMenuVisible = ref(false)
+const commandContextMenuX = ref(0)
+const commandContextMenuY = ref(0)
+const commandContextMessageId = ref('')
+const testedCommandKeys = ref<Set<string>>(loadTestedCommandKeys())
 const { isMobile } = useMobile()
+const { t } = useUiLanguage()
 
 function parsePlanFromMessageText(text: string): { explanation: string; steps: UiPlanStep[] } | null {
   const normalized = text.replace(/\r\n/g, '\n').trim()
@@ -924,6 +954,39 @@ function readPlanData(message: UiMessage): { explanation: string; steps: UiPlanS
     }
   }
   return parsePlanFromMessageText(message.text)
+}
+
+function loadTestedCommandKeys(): Set<string> {
+  if (typeof window === 'undefined') return new Set()
+  try {
+    const raw = window.localStorage.getItem(TESTED_COMMAND_STORAGE_KEY)
+    const parsed = raw ? JSON.parse(raw) as unknown : []
+    if (!Array.isArray(parsed)) return new Set()
+    return new Set(parsed.filter((value): value is string => typeof value === 'string' && value.trim().length > 0))
+  } catch {
+    return new Set()
+  }
+}
+
+function saveTestedCommandKeys(keys: Set<string>): void {
+  if (typeof window === 'undefined') return
+  try {
+    window.localStorage.setItem(TESTED_COMMAND_STORAGE_KEY, JSON.stringify([...keys]))
+  } catch {
+    // Keep the in-memory tag state even if storage is unavailable.
+  }
+}
+
+function commandTestedKey(message: UiMessage): string {
+  const commandId = message.id.trim()
+  if (!commandId) return ''
+  const threadId = props.activeThreadId.trim() || 'thread'
+  return `${threadId}:${commandId}`
+}
+
+function isCommandTested(message: UiMessage): boolean {
+  const key = commandTestedKey(message)
+  return Boolean(key && testedCommandKeys.value.has(key))
 }
 
 function isCommandMessage(message: UiMessage): boolean {
@@ -2619,6 +2682,16 @@ const fileLinkContextMenuStyle = computed(() => ({
   top: `${String(fileLinkContextMenuY.value)}px`,
 }))
 
+const commandContextMenuStyle = computed(() => ({
+  left: `${String(commandContextMenuX.value)}px`,
+  top: `${String(commandContextMenuY.value)}px`,
+}))
+
+const isCommandContextTargetTested = computed(() => {
+  const message = findCommandMessageById(commandContextMessageId.value)
+  return message ? isCommandTested(message) : false
+})
+
 function toEditUrlFromBrowseHref(href: string): string {
   const normalizedHref = href.trim()
   if (!normalizedHref) return ''
@@ -2645,6 +2718,7 @@ function onConversationContextMenu(event: MouseEvent): void {
   event.preventDefault()
   event.stopPropagation()
 
+  closeCommandContextMenu()
   fileLinkContextBrowseUrl.value = href
   fileLinkContextEditUrl.value = toEditUrlFromBrowseHref(href)
   fileLinkContextMenuX.value = event.clientX
@@ -2655,6 +2729,53 @@ function onConversationContextMenu(event: MouseEvent): void {
 function closeFileLinkContextMenu(): void {
   if (!isFileLinkContextMenuVisible.value) return
   isFileLinkContextMenuVisible.value = false
+}
+
+function findCommandMessageById(messageId: string): UiMessage | null {
+  const normalizedMessageId = messageId.trim()
+  if (!normalizedMessageId) return null
+  return props.messages.find((message) => message.id === normalizedMessageId && isCommandMessage(message)) ?? null
+}
+
+function isCommandContextMenuEligible(message: UiMessage): boolean {
+  return isCommandMessage(message) && message.commandExecution?.status !== 'inProgress'
+}
+
+function onCommandRowContextMenu(event: MouseEvent, message: UiMessage): void {
+  if (!isCommandContextMenuEligible(message)) return
+  closeFileLinkContextMenu()
+  commandContextMessageId.value = message.id
+  commandContextMenuX.value = event.clientX
+  commandContextMenuY.value = event.clientY
+  isCommandContextMenuVisible.value = true
+}
+
+function closeCommandContextMenu(): void {
+  if (!isCommandContextMenuVisible.value) return
+  isCommandContextMenuVisible.value = false
+  commandContextMessageId.value = ''
+}
+
+function toggleCommandTestedFromMenu(): void {
+  const message = findCommandMessageById(commandContextMessageId.value)
+  if (!message) {
+    closeCommandContextMenu()
+    return
+  }
+  const key = commandTestedKey(message)
+  if (!key) {
+    closeCommandContextMenu()
+    return
+  }
+  const next = new Set(testedCommandKeys.value)
+  if (next.has(key)) {
+    next.delete(key)
+  } else {
+    next.add(key)
+  }
+  testedCommandKeys.value = next
+  saveTestedCommandKeys(next)
+  closeCommandContextMenu()
 }
 
 function openFileLinkContextBrowse(): void {
@@ -2692,24 +2813,35 @@ async function copyFileLinkContextLink(): Promise<void> {
 }
 
 function onWindowPointerDownForFileLinkContextMenu(event: PointerEvent): void {
-  if (!isFileLinkContextMenuVisible.value) return
-  const menu = fileLinkContextMenuRef.value
-  if (!menu) {
-    closeFileLinkContextMenu()
-    return
-  }
   const target = event.target
-  if (target instanceof Node && menu.contains(target)) return
-  closeFileLinkContextMenu()
+  if (isFileLinkContextMenuVisible.value) {
+    const menu = fileLinkContextMenuRef.value
+    if (!menu) {
+      closeFileLinkContextMenu()
+    } else if (!(target instanceof Node && menu.contains(target))) {
+      closeFileLinkContextMenu()
+    }
+  }
+
+  if (isCommandContextMenuVisible.value) {
+    const menu = commandContextMenuRef.value
+    if (!menu) {
+      closeCommandContextMenu()
+    } else if (!(target instanceof Node && menu.contains(target))) {
+      closeCommandContextMenu()
+    }
+  }
 }
 
 function onWindowBlurForFileLinkContextMenu(): void {
   closeFileLinkContextMenu()
+  closeCommandContextMenu()
 }
 
 function onWindowKeydownForFileLinkContextMenu(event: KeyboardEvent): void {
   if (event.key !== 'Escape') return
   closeFileLinkContextMenu()
+  closeCommandContextMenu()
 }
 
 function normalizeMarkdownText(text: string): string {
@@ -4801,7 +4933,23 @@ onBeforeUnmount(() => {
 }
 
 .file-link-context-menu-item {
-  @apply block w-full rounded-md px-2 py-1.5 text-left text-xs text-zinc-700 hover:bg-zinc-100;
+  @apply flex w-full items-center rounded-md px-2 py-1.5 text-left text-xs text-zinc-700 hover:bg-zinc-100;
+}
+
+.command-context-menu {
+  @apply min-w-32;
+}
+
+.command-context-menu-item {
+  @apply gap-2;
+}
+
+.command-context-checkbox {
+  @apply flex h-4 w-4 shrink-0 items-center justify-center rounded border border-zinc-300 text-[11px] font-bold leading-none text-zinc-700;
+}
+
+.command-context-checkbox[data-checked='true'] {
+  @apply border-zinc-700 bg-zinc-900 text-white;
 }
 
 .message-divider {
@@ -4936,6 +5084,10 @@ onBeforeUnmount(() => {
 
 .cmd-status {
   @apply max-w-24 truncate text-right text-[11px] font-medium flex-shrink-0;
+}
+
+.cmd-tested-badge {
+  @apply shrink-0 rounded border border-zinc-300 bg-white px-1.5 py-0.5 text-[10px] font-semibold leading-none text-zinc-600;
 }
 
 .cmd-status-running .cmd-status {

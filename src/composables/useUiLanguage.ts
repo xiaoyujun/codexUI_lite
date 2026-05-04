@@ -405,6 +405,10 @@ const zhCN: Record<string, string> = {
   'Standard': '标准',
   'Wide': '宽',
   'Extra wide': '超宽',
+  'Open link': '打开链接',
+  'Copy link': '复制链接',
+  'Edit file': '编辑文件',
+  'Tested': '已测试',
 }
 
 const LANGUAGE_LABELS: Record<UiLanguage, string> = {

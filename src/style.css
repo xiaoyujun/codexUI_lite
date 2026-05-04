@@ -623,6 +623,10 @@
   @apply text-zinc-400;
 }
 
+:root.dark .cmd-tested-badge {
+  @apply border-zinc-600 bg-zinc-900 text-zinc-300;
+}
+
 :root.dark .cmd-status-running .cmd-status {
   @apply text-zinc-400;
 }
@@ -637,6 +641,22 @@
 
 :root.dark .cmd-output-wrap.cmd-output-visible {
   @apply border-zinc-700;
+}
+
+:root.dark .file-link-context-menu {
+  @apply border-zinc-700 bg-zinc-900 shadow-black/30;
+}
+
+:root.dark .file-link-context-menu-item {
+  @apply text-zinc-200 hover:bg-zinc-800;
+}
+
+:root.dark .command-context-checkbox {
+  @apply border-zinc-600 text-zinc-200;
+}
+
+:root.dark .command-context-checkbox[data-checked='true'] {
+  @apply border-zinc-300 bg-zinc-100 text-zinc-900;
 }
 
 :root.dark .file-change-summary-label {

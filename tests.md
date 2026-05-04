@@ -342,6 +342,40 @@ Composer model picker can start a new chat with a Codex provider configuration r
 
 ---
 
+### Command right-click tested tag and localized menu
+
+#### Feature/Change Name
+Completed command rows expose a localized right-click menu with a persistent `Tested` checkbox/tag.
+
+#### Prerequisites/Setup
+1. Dev server running (`pnpm run dev`)
+2. Open a thread with at least one completed command execution row
+3. Light theme and dark theme both available from the appearance switcher
+4. UI language can be switched between English and Simplified Chinese in Settings
+
+#### Steps
+1. In light theme with English selected, right-click a completed command row.
+2. Confirm the custom menu opens and includes a `Tested` checkbox item.
+3. Click `Tested` and confirm an inline `Tested` tag appears on that command row.
+4. Right-click the same command again, click `Tested`, and confirm the tag is removed.
+5. Switch UI language to Simplified Chinese.
+6. Right-click a completed command row and confirm the menu item and tag show `已测试`.
+7. Right-click a file link and confirm the link context menu actions are localized.
+8. Refresh the browser and confirm tested command tags selected before refresh are restored.
+9. Switch to dark theme and repeat steps 1-7.
+
+#### Expected Results
+- Completed command rows show the custom right-click menu; in-progress commands do not expose the tested menu.
+- The `Tested` / `已测试` item toggles a small inline tag on that command row.
+- The tag state persists in browser local storage per thread/command id.
+- File-link context menu labels follow the selected UI language.
+- The menu, checkbox, and tag are readable in both light and dark themes.
+
+#### Rollback/Cleanup
+- Clear browser local storage key `codex-web-local.command-tested-tags.v1` to remove any test tags.
+
+---
+
 ### Windows startup batch script
 
 #### Feature/Change Name
