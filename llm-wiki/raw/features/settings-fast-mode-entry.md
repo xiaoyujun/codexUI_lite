@@ -1,4 +1,4 @@
-# Settings Fast Mode Entry
+# Fast Mode Entry Placement
 
 Date: 2026-05-04
 
@@ -8,5 +8,5 @@ Date: 2026-05-04
 - Persisting Fast mode uses `/codex-api/rpc` method `config/batchWrite` through `setCodexSpeedMode`.
 - The persisted config writes `features.fast_mode = true` and sets `service_tier = "fast"` when enabled.
 - Disabling Fast mode clears `service_tier` back to standard behavior.
-- The Settings panel now exposes a direct `Fast mode` switch near Appearance and UI language.
-- The composer attachment menu Fast mode toggle remains in place and shares the same state.
+- The Fast mode switch belongs in the composer attachment menu with the mode controls, not in sidebar Settings.
+- In the composer attachment menu, the regular/plan mode control appears before `Fast mode`.

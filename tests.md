@@ -346,33 +346,34 @@ Composer model picker can start a new chat with a Codex provider configuration r
 
 ---
 
-### Settings Fast mode toggle
+### Composer Fast mode placement
 
 #### Feature/Change Name
-Sidebar Settings exposes a direct `Fast mode` switch that writes the Codex speed setting.
+Composer attachment menu places the `Fast mode` switch under the mode controls instead of in sidebar Settings.
 
 #### Prerequisites/Setup
 1. Dev server running (`pnpm run dev`)
-2. Settings panel is accessible from the sidebar footer
+2. A thread or new chat is open with the composer visible
 3. Light theme and dark theme both available from the appearance switcher
+4. The selected model supports Fast mode (`gpt-5.4`)
 
 #### Steps
-1. In light theme, open Settings from the sidebar footer.
-2. Locate the `Fast mode` row near Appearance and UI language.
-3. Click the row and confirm the switch turns on.
+1. In light theme, open the composer `+` attachment menu.
+2. Confirm the mode switch row (`Plan mode` / regular mode control) appears before `Fast mode`.
+3. Click `Fast mode` and confirm the switch turns on.
 4. Confirm `~/.codex/config.toml` records `service_tier = "fast"` and `features.fast_mode = true`.
-5. Click the row again and confirm the switch turns off.
-6. Confirm the speed setting is cleared back to standard mode.
-7. Switch to dark theme and repeat steps 1-5.
+5. Click `Fast mode` again and confirm the switch turns off.
+6. Open sidebar Settings and confirm there is no separate `Fast mode` row there.
+7. Switch to dark theme and repeat steps 1-6.
 
 #### Expected Results
-- Fast mode can be toggled directly from Settings without opening the composer attachment menu.
-- The setting uses the same backend persistence path as the existing composer Fast mode toggle.
-- The row disables or pulses while the speed setting is being saved.
-- The switch remains readable in both light and dark themes.
+- Fast mode is toggled from the composer mode menu, directly below the regular/plan mode control.
+- The setting uses the existing backend persistence path for the composer Fast mode toggle.
+- The switch disables or pulses while the speed setting is being saved.
+- The composer menu remains readable in both light and dark themes, and Settings does not expose a duplicate Fast mode entry.
 
 #### Rollback/Cleanup
-- Turn Fast mode off from Settings to restore standard speed.
+- Turn Fast mode off from the composer attachment menu to restore standard speed.
 
 ---
 

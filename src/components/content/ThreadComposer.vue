@@ -190,6 +190,24 @@
             </div>
             <div class="thread-composer-attach-separator" />
             <button
+              class="thread-composer-attach-setting"
+              type="button"
+              role="switch"
+              :aria-checked="isPlanModeSelected"
+              :aria-label="isPlanModeSelected ? t('Disable plan mode') : t('Enable plan mode')"
+              :disabled="isComposerConfigDisabled"
+              @click="toggleCollaborationMode"
+            >
+              <span class="thread-composer-attach-setting-copy">
+                <span class="thread-composer-attach-setting-label">{{ t('Plan mode') }}</span>
+                <span class="thread-composer-attach-setting-description">{{ t('Agent proposes a plan before acting') }}</span>
+              </span>
+              <span
+                class="thread-composer-attach-switch"
+                :class="{ 'is-on': isPlanModeSelected }"
+              />
+            </button>
+            <button
               v-if="isFastModeSupported"
               class="thread-composer-attach-setting"
               type="button"
@@ -210,24 +228,6 @@
                   'is-busy': isUpdatingSpeedMode,
                   'is-disabled': isSpeedToggleDisabled,
                 }"
-              />
-            </button>
-            <button
-              class="thread-composer-attach-setting"
-              type="button"
-              role="switch"
-              :aria-checked="isPlanModeSelected"
-              :aria-label="isPlanModeSelected ? t('Disable plan mode') : t('Enable plan mode')"
-              :disabled="isComposerConfigDisabled"
-              @click="toggleCollaborationMode"
-            >
-              <span class="thread-composer-attach-setting-copy">
-                <span class="thread-composer-attach-setting-label">{{ t('Plan mode') }}</span>
-                <span class="thread-composer-attach-setting-description">{{ t('Agent proposes a plan before acting') }}</span>
-              </span>
-              <span
-                class="thread-composer-attach-switch"
-                :class="{ 'is-on': isPlanModeSelected }"
               />
             </button>
           </div>

@@ -13,7 +13,7 @@
 - [concepts/merge-to-main-workflow.md](./concepts/merge-to-main-workflow.md): branch integration and conflict-resolution workflow.
 - [concepts/opencode-zen-big-pickle.md](./concepts/opencode-zen-big-pickle.md): OpenCode Zen Big Pickle model configuration for Codex CLI and OpenCode CLI.
 - [concepts/realtime-chat-rendering.md](./concepts/realtime-chat-rendering.md): realtime chat rendering, sync-churn reduction, and inline media sanitization.
-- [concepts/settings-and-model-controls.md](./concepts/settings-and-model-controls.md): sidebar Settings and composer model-adjacent controls, including Fast mode.
+- [concepts/settings-and-model-controls.md](./concepts/settings-and-model-controls.md): sidebar Settings and composer model-adjacent controls, including composer Fast mode placement.
 - [concepts/skills-route-ui.md](./concepts/skills-route-ui.md): Skills route naming, first-launch Plugins card persistence, dark-theme fixes, and verification lessons.
 
 ## Sources
@@ -22,7 +22,7 @@
 - [../raw/features/cc-switch-codex-provider-models.md](../raw/features/cc-switch-codex-provider-models.md): source facts for cc-switch Codex provider database shape and model-picker integration.
 - [../raw/features/command-tested-tags.md](../raw/features/command-tested-tags.md): source facts for command row tested tags and localized context menus.
 - [../raw/features/realtime-chat-rendering-inline-media.md](../raw/features/realtime-chat-rendering-inline-media.md): source facts for realtime chat rendering and inline media sanitization.
-- [../raw/features/settings-fast-mode-entry.md](../raw/features/settings-fast-mode-entry.md): source facts for the sidebar Settings Fast mode entry.
+- [../raw/features/settings-fast-mode-entry.md](../raw/features/settings-fast-mode-entry.md): source facts for Fast mode placement in the composer mode menu.
 - [../raw/features/skills-route-ui-and-first-launch-card.md](../raw/features/skills-route-ui-and-first-launch-card.md): source facts for the Skills route rename, first-launch Plugins card, dark-theme fix, and dev-server workflow adjustment.
 - [../raw/fixes/cc-switch-model-picker-entry-visibility.md](../raw/fixes/cc-switch-model-picker-entry-visibility.md): source facts for the fresh-load cc-switch model picker visibility fix.
 - [../raw/fixes/cc-switch-thread-model-display-preservation.md](../raw/fixes/cc-switch-thread-model-display-preservation.md): source facts for preserving cc-switch provider labels after thread creation.

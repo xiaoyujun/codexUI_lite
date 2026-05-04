@@ -1,9 +1,15 @@
 # Log
 
+## [2026-05-04] update | composer Fast mode placement
+- Updated source: `raw/features/settings-fast-mode-entry.md`.
+- Updated wiki page: `concepts/settings-and-model-controls.md`.
+- Documents: Fast mode belongs under the composer mode control, while sidebar Settings no longer exposes a duplicate Fast mode switch.
+- Updated `index.md`.
+
 ## [2026-05-04] ingest | settings fast mode entry
 - Added source: `raw/features/settings-fast-mode-entry.md`.
 - Created wiki page: `concepts/settings-and-model-controls.md`.
-- Documents: sidebar Settings now exposes a direct Fast mode switch sharing the existing `config/batchWrite` speed-mode persistence.
+- Documents: Fast mode speed persistence through the existing `config/batchWrite` path.
 - Updated `index.md`.
 
 ## [2026-05-04] ingest | cc-switch thread model display preservation
