@@ -4605,11 +4605,11 @@ onBeforeUnmount(() => {
 }
 
 .message-card {
-  @apply max-w-[min(var(--chat-card-max,76ch),100%)] px-0 py-0 bg-transparent border-none rounded-none;
+  @apply max-w-[min(var(--chat-card-max,72ch),100%)] px-0 py-0 bg-transparent border-none rounded-none;
 }
 
 .message-text-flow {
-  @apply flex flex-col gap-2;
+  @apply flex flex-col gap-3;
 }
 
 .plan-card {
@@ -4633,7 +4633,7 @@ onBeforeUnmount(() => {
 }
 
 .plan-card-markdown {
-  @apply flex flex-col gap-2;
+  @apply flex flex-col gap-3;
 }
 
 .plan-card-markdown :deep(.message-text),
@@ -4647,43 +4647,43 @@ onBeforeUnmount(() => {
 }
 
 .plan-card-markdown :deep(.message-text) {
-  @apply text-sm leading-relaxed whitespace-pre-wrap text-zinc-800;
+  @apply text-[15px] leading-[1.7] whitespace-pre-wrap text-zinc-800;
 }
 
 .plan-card-markdown :deep(.message-heading) {
-  @apply text-zinc-900 tracking-tight;
+  @apply text-zinc-900 tracking-normal;
 }
 
 .plan-card-markdown :deep(.message-heading-h1) {
-  @apply text-2xl font-semibold leading-tight;
+  @apply text-[1.35rem] font-semibold leading-[1.25];
 }
 
 .plan-card-markdown :deep(.message-heading-h2) {
-  @apply text-xl font-semibold leading-tight;
+  @apply text-[1.2rem] font-semibold leading-[1.3];
 }
 
 .plan-card-markdown :deep(.message-heading-h3) {
-  @apply text-lg font-semibold leading-snug;
+  @apply text-[1.08rem] font-semibold leading-[1.35];
 }
 
 .plan-card-markdown :deep(.message-heading-h4) {
-  @apply text-base font-semibold leading-snug;
+  @apply text-[15px] font-semibold leading-[1.4];
 }
 
 .plan-card-markdown :deep(.message-heading-h5) {
-  @apply text-sm font-semibold leading-snug uppercase tracking-[0.02em];
+  @apply text-sm font-semibold leading-[1.45];
 }
 
 .plan-card-markdown :deep(.message-heading-h6) {
-  @apply text-xs font-semibold leading-snug uppercase tracking-[0.04em] text-zinc-600;
+  @apply text-xs font-semibold leading-[1.5] text-zinc-600;
 }
 
 .plan-card-markdown :deep(.message-blockquote) {
-  @apply border-l-4 border-zinc-300 pl-4 py-1 text-sm leading-relaxed whitespace-pre-wrap text-zinc-700 bg-zinc-50/70 rounded-r-lg;
+  @apply border-l-2 border-zinc-300 bg-zinc-50/80 py-2 pl-3 pr-3 text-[15px] leading-[1.7] whitespace-pre-wrap text-zinc-700 rounded-r-lg;
 }
 
 .plan-card-markdown :deep(.message-list) {
-  @apply pl-5 text-sm leading-relaxed text-zinc-800 flex flex-col gap-1.5;
+  @apply pl-5 text-[15px] leading-[1.7] text-zinc-800 flex flex-col gap-2;
 }
 
 .plan-card-markdown :deep(.message-list-unordered) {
@@ -4719,15 +4719,15 @@ onBeforeUnmount(() => {
 }
 
 .plan-card-markdown :deep(.message-code-block) {
-  @apply overflow-hidden rounded-xl border border-zinc-200 bg-zinc-950/95 text-zinc-100;
+  @apply overflow-hidden rounded-lg border border-zinc-200 bg-zinc-950/95 text-zinc-100;
 }
 
 .plan-card-markdown :deep(.message-code-language) {
-  @apply border-b border-zinc-800 bg-zinc-900/90 px-3 py-2 text-[11px] font-medium uppercase tracking-[0.08em] text-zinc-400;
+  @apply border-b border-zinc-800 bg-zinc-900/90 px-3 py-2 font-mono text-[11px] font-medium leading-4 text-zinc-400;
 }
 
 .plan-card-markdown :deep(.message-code-pre) {
-  @apply m-0 overflow-x-auto px-3 py-3 text-[13px] leading-6;
+  @apply m-0 overflow-x-auto px-3.5 py-3 text-[13px] leading-6;
 }
 
 .plan-card-markdown :deep(.message-inline-code) {
@@ -4783,45 +4783,53 @@ onBeforeUnmount(() => {
 }
 
 .message-text {
-  @apply m-0 text-sm leading-relaxed whitespace-pre-wrap break-words text-zinc-800;
+  @apply m-0 text-[15px] leading-[1.72] whitespace-pre-wrap break-words text-zinc-800;
   overflow-wrap: anywhere;
 }
 
 .message-heading {
-  @apply m-0 text-zinc-900 tracking-tight;
+  @apply m-0 text-zinc-950 tracking-normal;
+}
+
+.message-heading:not(:first-child) {
+  @apply mt-1;
 }
 
 .message-heading-h1 {
-  @apply text-2xl font-semibold leading-tight;
+  @apply text-[1.35rem] font-semibold leading-[1.25];
 }
 
 .message-heading-h2 {
-  @apply text-xl font-semibold leading-tight;
+  @apply text-[1.2rem] font-semibold leading-[1.3];
 }
 
 .message-heading-h3 {
-  @apply text-lg font-semibold leading-snug;
+  @apply text-[1.08rem] font-semibold leading-[1.35];
 }
 
 .message-heading-h4 {
-  @apply text-base font-semibold leading-snug;
+  @apply text-[15px] font-semibold leading-[1.4];
 }
 
 .message-heading-h5 {
-  @apply text-sm font-semibold leading-snug uppercase tracking-[0.02em];
+  @apply text-sm font-semibold leading-[1.45];
 }
 
 .message-heading-h6 {
-  @apply text-xs font-semibold leading-snug uppercase tracking-[0.04em] text-zinc-600;
+  @apply text-xs font-semibold leading-[1.5] text-zinc-600;
 }
 
 .message-blockquote {
-  @apply m-0 border-l-4 border-zinc-300 pl-4 py-1 text-sm leading-relaxed whitespace-pre-wrap break-words text-zinc-700 bg-zinc-50/70 rounded-r-lg;
+  @apply m-0 border-l-2 border-zinc-300 bg-zinc-50/80 py-2 pl-3 pr-3 text-[15px] leading-[1.7] whitespace-pre-wrap break-words text-zinc-700 rounded-r-lg;
   overflow-wrap: anywhere;
 }
 
 .message-list {
-  @apply m-0 pl-5 text-sm leading-relaxed text-zinc-800 flex flex-col gap-1.5;
+  @apply m-0 pl-5 text-[15px] leading-[1.7] text-zinc-800 flex flex-col gap-2;
+}
+
+.message-list ::marker {
+  color: rgb(113 113 122);
 }
 
 .message-list-unordered {
@@ -4837,7 +4845,7 @@ onBeforeUnmount(() => {
 }
 
 .message-list-item-content {
-  @apply flex flex-col gap-1.5;
+  @apply flex flex-col gap-2;
 }
 
 .message-list-item-text {
@@ -4854,7 +4862,7 @@ onBeforeUnmount(() => {
 }
 
 .message-task-item {
-  @apply flex items-start gap-2;
+  @apply flex items-start gap-2.5;
 }
 
 .message-task-checkbox {
@@ -4866,12 +4874,12 @@ onBeforeUnmount(() => {
 }
 
 .message-table {
-  @apply min-w-full border-separate border-spacing-0 overflow-hidden rounded-xl border border-zinc-200 bg-white text-sm text-zinc-800;
+  @apply min-w-full border-separate border-spacing-0 overflow-hidden rounded-lg border border-zinc-200 bg-white text-sm leading-6 text-zinc-800;
 }
 
 .message-table-head-cell,
 .message-table-cell {
-  @apply border-b border-l border-zinc-200 px-3 py-2 align-top whitespace-pre-wrap break-words;
+  @apply border-b border-l border-zinc-200 px-3 py-2.5 align-top whitespace-pre-wrap break-words;
   overflow-wrap: anywhere;
 }
 
@@ -4906,18 +4914,19 @@ onBeforeUnmount(() => {
 
 .message-inline-code {
   @apply rounded-md border border-zinc-200 bg-zinc-100/60 px-1.5 py-0.5 text-[0.875em] leading-[1.4] text-zinc-900 font-mono;
+  word-break: break-word;
 }
 
 .message-code-block {
-  @apply overflow-hidden rounded-xl border border-zinc-200 bg-zinc-950 text-zinc-100;
+  @apply overflow-hidden rounded-lg border border-zinc-200 bg-zinc-950 text-zinc-100;
 }
 
 .message-code-language {
-  @apply border-b border-zinc-800 px-3 py-2 text-[11px] font-mono uppercase tracking-[0.08em] text-zinc-400;
+  @apply border-b border-zinc-800 bg-zinc-900 px-3 py-2 text-[11px] leading-4 font-mono text-zinc-400;
 }
 
 .message-code-pre {
-  @apply m-0 overflow-x-auto px-3 py-3 text-[13px] leading-relaxed font-mono whitespace-pre;
+  @apply m-0 overflow-x-auto px-3.5 py-3 text-[13px] leading-6 font-mono whitespace-pre;
 }
 
 .message-code-pre :deep(.hljs) {
@@ -4925,7 +4934,8 @@ onBeforeUnmount(() => {
 }
 
 .message-file-link {
-  @apply text-sm leading-relaxed text-zinc-900 underline decoration-zinc-300 underline-offset-2 hover:text-black;
+  @apply text-[0.95em] font-medium leading-relaxed text-zinc-900 underline decoration-zinc-400 underline-offset-2 hover:text-black;
+  overflow-wrap: anywhere;
 }
 
 .file-link-context-menu {

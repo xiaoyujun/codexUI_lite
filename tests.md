@@ -310,6 +310,36 @@ This file tracks manual regression and feature verification steps.
 
 ---
 
+### Chat message readability styling
+
+#### Feature/Change Name
+Assistant and plan message markdown typography uses improved readable spacing, hierarchy, and structural block styling.
+
+#### Prerequisites/Setup
+1. Dev server running (`pnpm run dev`)
+2. A thread with assistant output containing paragraphs, headings, lists, blockquotes, inline code, fenced code, links, and tables
+3. Light theme and dark theme are available from the appearance switcher
+
+#### Steps
+1. In light theme, open the test thread and inspect assistant markdown output.
+2. Confirm paragraph text has comfortable line height and does not span too wide.
+3. Confirm headings are visually distinct without becoming oversized.
+4. Confirm lists, blockquotes, inline code, fenced code blocks, links, and tables have clear spacing and remain readable.
+5. Confirm long paths, URLs, and inline code wrap inside the message column without horizontal page overflow.
+6. Switch to dark theme and repeat steps 2 through 5.
+7. Inspect a plan message, if available, and confirm its markdown follows the same readable rhythm in both themes.
+
+#### Expected Results
+- Assistant message text is easier to scan because paragraph/list spacing and line height are more generous.
+- Markdown headings provide hierarchy while staying appropriate for a chat surface.
+- Blockquotes, code blocks, inline code, file/URL links, and tables are visually separated but remain aligned with the existing monochrome UI.
+- Light-theme and dark-theme message surfaces have sufficient contrast and no light-theme blocks appear inside dark theme.
+
+#### Rollback/Cleanup
+- None.
+
+---
+
 ### cc-switch Codex provider model selection
 
 #### Feature/Change Name
