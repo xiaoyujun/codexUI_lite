@@ -1,5 +1,11 @@
 # Log
 
+## [2026-05-04] ingest | cc-switch thread model display preservation
+- Added source: `raw/fixes/cc-switch-thread-model-display-preservation.md`.
+- Updated wiki page: `concepts/cc-switch-codex-provider-models.md`.
+- Documents: per-thread cc-switch virtual model ids are preserved for UI labels after `thread/start`, while follow-up turns resolve them to real app-server model values.
+- Updated `index.md`.
+
 ## [2026-05-04] ingest | cc-switch model picker entry visibility
 - Added source: `raw/fixes/cc-switch-model-picker-entry-visibility.md`.
 - Updated wiki page: `concepts/cc-switch-codex-provider-models.md`.

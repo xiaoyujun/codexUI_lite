@@ -58,6 +58,7 @@ import type {
   UiThread,
 } from '../types/codex'
 import { getPathParent, isProjectlessChatPath, normalizePathForUi, toProjectName } from '../pathUtils.js'
+import { isCcSwitchCodexModelSelection } from '../ccSwitchCodexModel'
 
 function flattenThreads(groups: UiProjectGroup[]): UiThread[] {
   return groups.flatMap((group) => group.threads)
@@ -1592,6 +1593,17 @@ export function useDesktopState() {
     saveSelectedModelMap(selectedModelIdByContext.value)
   }
 
+  function displayModelIdForThread(requestedModelId: string, resolvedModelId: string): string {
+    const normalizedRequestedModelId = requestedModelId.trim()
+    if (isCcSwitchCodexModelSelection(normalizedRequestedModelId)) return normalizedRequestedModelId
+    return resolvedModelId.trim()
+  }
+
+  function preserveCcSwitchDisplayModelForThread(threadId: string, resolvedModelId: string): void {
+    const currentModelId = readModelIdForThread(threadId)
+    setThreadModelId(threadId, displayModelIdForThread(currentModelId, resolvedModelId))
+  }
+
   function setThreadTokenUsage(threadId: string, usage: UiThreadTokenUsage | null): void {
     const normalizedThreadId = threadId.trim()
     if (!normalizedThreadId) return
@@ -1813,7 +1825,7 @@ export function useDesktopState() {
       }
       availableModelIds.value = nextModelIds
 
-      const currentModelInNewList = normalizedSelectedModelId && modelIds.includes(normalizedSelectedModelId)
+      const currentModelInNewList = normalizedSelectedModelId && nextModelIds.includes(normalizedSelectedModelId)
       if (!normalizedSelectedModelId || !currentModelInNewList || options?.providerChanged) {
         if (options?.providerChanged && nextModelIds.length > 0) {
           if (providerScopedModelId && nextModelIds.includes(providerScopedModelId)) {
@@ -4137,7 +4149,7 @@ export function useDesktopState() {
       const detail = resumedThread ?? await getThreadDetail(threadId)
 
       if (resumedThread) {
-        setThreadModelId(threadId, resumedThread.model)
+        preserveCcSwitchDisplayModelForThread(threadId, resumedThread.model)
         resumedThreadById.value = {
           ...resumedThreadById.value,
           [threadId]: true,
@@ -4394,7 +4406,7 @@ export function useDesktopState() {
       if (!nextThreadId) return ''
 
       insertOptimisticThread(nextThreadId, sourceCwd, sourceTitle)
-      setThreadModelId(nextThreadId, forkedThread.model)
+      setThreadModelId(nextThreadId, displayModelIdForThread(selectedModel, forkedThread.model))
       resumedThreadById.value = {
         ...resumedThreadById.value,
         [nextThreadId]: true,
@@ -4448,7 +4460,7 @@ export function useDesktopState() {
       const forkedCwd = forked.cwd.trim() || sourceThread?.cwd?.trim() || ''
       const forkedThreadTitle = toForkedThreadTitle(sourceThread?.title || sourceThread?.preview || 'Untitled thread')
       insertOptimisticThread(forkedThreadId, forkedCwd, forkedThreadTitle)
-      setThreadModelId(forkedThreadId, forked.model)
+      setThreadModelId(forkedThreadId, displayModelIdForThread(readModelIdForThread(normalizedThreadId), forked.model))
       setPersistedMessagesForThread(forkedThreadId, forked.messages)
       loadedMessagesByThreadId.value = {
         ...loadedMessagesByThreadId.value,
@@ -4647,7 +4659,7 @@ export function useDesktopState() {
       try {
         const startedThread = await startThread(targetCwd || undefined, selectedModel || undefined)
         threadId = startedThread.threadId
-        setThreadModelId(threadId, startedThread.model)
+        setThreadModelId(threadId, displayModelIdForThread(selectedModel, startedThread.model))
         setSelectedCollaborationModeForThread(threadId, selectedMode)
       } catch (unknownError) {
         if (selectedModel && selectedModel !== MODEL_FALLBACK_ID && isUnsupportedChatGptModelError(unknownError)) {
@@ -4756,7 +4768,7 @@ export function useDesktopState() {
     try {
       if (resumedThreadById.value[threadId] !== true) {
         const resumedThread = await resumeThread(threadId)
-        setThreadModelId(threadId, resumedThread.model)
+        preserveCcSwitchDisplayModelForThread(threadId, resumedThread.model)
       }
       const modelId = readModelIdForThread(threadId)
 

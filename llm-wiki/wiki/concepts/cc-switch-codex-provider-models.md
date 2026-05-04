@@ -21,6 +21,10 @@ The initial app load must include provider-backed models in its background model
 
 Source: [cc-switch-model-picker-entry-visibility.md](../../raw/fixes/cc-switch-model-picker-entry-visibility.md)
 
+After `thread/start`, app-server returns the real model id. The web UI keeps the original `cc-switch-codex:` virtual id as the per-thread display selection so the active conversation composer still shows the cc-switch provider label. Follow-up turns resolve that virtual id back to the real model before forwarding to app-server.
+
+Source: [cc-switch-thread-model-display-preservation.md](../../raw/fixes/cc-switch-thread-model-display-preservation.md)
+
 ## Server Resolution
 
 When a virtual model id reaches `thread/start` or `thread/fork`, the bridge rereads `cc-switch.db`, resolves the selected provider, parses its Codex TOML, merges `common_config_codex`, and forwards:

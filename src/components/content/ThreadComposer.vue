@@ -584,7 +584,12 @@ function formatModelLabel(modelId: string): string {
 
 const modelOptions = computed(() =>
   props.models
-    .filter((modelId) => isNewThreadComposer.value || !isCcSwitchCodexModelSelection(modelId))
+    .filter((modelId) => {
+      const normalizedModelId = modelId.trim()
+      if (!isCcSwitchCodexModelSelection(normalizedModelId)) return true
+      if (isNewThreadComposer.value) return true
+      return normalizedModelId === props.selectedModel.trim()
+    })
     .map((modelId) => ({ value: modelId, label: formatModelLabel(modelId) })),
 )
 const isPlanModeSelected = computed(() => props.selectedCollaborationMode === 'plan')

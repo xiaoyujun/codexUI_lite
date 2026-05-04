@@ -23,5 +23,6 @@
 - [../raw/features/realtime-chat-rendering-inline-media.md](../raw/features/realtime-chat-rendering-inline-media.md): source facts for realtime chat rendering and inline media sanitization.
 - [../raw/features/skills-route-ui-and-first-launch-card.md](../raw/features/skills-route-ui-and-first-launch-card.md): source facts for the Skills route rename, first-launch Plugins card, dark-theme fix, and dev-server workflow adjustment.
 - [../raw/fixes/cc-switch-model-picker-entry-visibility.md](../raw/fixes/cc-switch-model-picker-entry-visibility.md): source facts for the fresh-load cc-switch model picker visibility fix.
+- [../raw/fixes/cc-switch-thread-model-display-preservation.md](../raw/fixes/cc-switch-thread-model-display-preservation.md): source facts for preserving cc-switch provider labels after thread creation.
 - [../raw/projects/codex-web-local.md](../raw/projects/codex-web-local.md): immutable source snapshot for project facts.
 - [../raw/fixes/opencode-zen-big-pickle-codex-cli.md](../raw/fixes/opencode-zen-big-pickle-codex-cli.md): Big Pickle + Codex CLI fix details.

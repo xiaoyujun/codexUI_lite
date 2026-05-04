@@ -550,8 +550,24 @@ export async function resolveCcSwitchCodexModelOnlyParams(params: unknown): Prom
     throw new Error('Selected cc-switch Codex provider is no longer available')
   }
 
-  return {
+  const collaborationMode = asRecord(record.collaborationMode)
+  const collaborationModeSettings = asRecord(collaborationMode?.settings)
+  const resolvedCollaborationMode = collaborationMode && collaborationModeSettings
+    ? {
+        ...collaborationMode,
+        settings: {
+          ...collaborationModeSettings,
+          model: resolved.selection.model,
+        },
+      }
+    : record.collaborationMode
+
+  const nextRecord: Record<string, unknown> = {
     ...record,
     model: resolved.selection.model,
   }
+  if (resolvedCollaborationMode !== undefined) {
+    nextRecord.collaborationMode = resolvedCollaborationMode
+  }
+  return nextRecord
 }

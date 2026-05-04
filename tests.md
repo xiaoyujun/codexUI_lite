@@ -326,15 +326,18 @@ Composer model picker can start a new chat with a Codex provider configuration r
 2. Open the model dropdown after the initial background model refresh completes, then search for the provider name from `cc-switch`.
 3. Select the `cc-switch` provider/model option.
 4. Send a first message to create a new chat.
-5. Confirm the chat starts successfully and the created thread uses the selected provider's model.
-6. Confirm `~/.codex/config.toml` is not rewritten just by selecting the model option.
-7. Switch to dark theme and repeat steps 1-5.
+5. Confirm the chat starts successfully and the composer in the created thread still displays the selected `cc-switch` provider/model label.
+6. Send a second message in the created thread and confirm the turn starts without sending the encoded `cc-switch-codex:` id to app-server model settings.
+7. Confirm `~/.codex/config.toml` is not rewritten just by selecting the model option.
+8. Switch to dark theme and repeat steps 1-6.
 
 #### Expected Results
 - The model dropdown includes one option per usable `cc-switch` Codex provider.
 - The option label shows the `cc-switch` provider name and model.
 - The options are visible from a fresh app load without changing global provider settings first.
+- After the first message creates the thread, the active conversation composer preserves the same provider/model label instead of collapsing to only the raw model name.
 - Starting a new chat resolves the selected provider on the server side, including shared `cc-switch` common Codex config and provider auth.
+- Follow-up turns in that thread resolve the virtual selection to the real model for both top-level `model` and collaboration-mode model settings.
 - Provider auth is not exposed to the browser model list payload.
 - The model dropdown remains readable in both light and dark themes.
 
