@@ -51,10 +51,11 @@ if not exist "node_modules\.bin\vite.cmd" (
 echo Starting codexui from: %CD%
 
 if "%~1"=="" (
-  echo URL: http://127.0.0.1:5173
+  echo Local URL: http://localhost:5173
+  echo LAN URL: use http://^<this-computer-LAN-IP^>:5173 from another device.
   echo Tip: pass Vite args after the script name, for example:
-  echo   start.bat --host 0.0.0.0 --port 4173
-  call %PNPM_CMD% exec vite --host 127.0.0.1 --port 5173
+  echo   start.bat --host 127.0.0.1 --port 4173
+  call %PNPM_CMD% exec vite --host 0.0.0.0 --port 5173
 ) else (
   echo Dev args: %*
   call %PNPM_CMD% exec vite %*

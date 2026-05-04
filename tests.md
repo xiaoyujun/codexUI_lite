@@ -414,7 +414,7 @@ Completed command rows expose a localized right-click menu with a persistent `Te
 ### Windows startup batch script
 
 #### Feature/Change Name
-Root-level `start.bat` launches the local codexui development server on Windows.
+Root-level `start.bat` launches the codexui development server on Windows and allows LAN clients by default.
 
 #### Prerequisites/Setup
 1. Windows command prompt or double-click access to the repository root
@@ -425,11 +425,15 @@ Root-level `start.bat` launches the local codexui development server on Windows.
 1. From the repository root, run `start.bat --help`.
 2. Confirm the script changes into the repository root automatically.
 3. Confirm the script invokes Vite through `pnpm exec vite` and forwards the `--help` argument.
-4. Optionally run `start.bat --host 127.0.0.1 --port 4173` when a live development server is needed.
+4. Optionally run `start.bat` when a live development server is needed.
+5. From another device on the same LAN, open `http://<this-computer-LAN-IP>:5173`.
+6. If a loopback-only development server is needed, run `start.bat --host 127.0.0.1 --port 4173`.
 
 #### Expected Results
 - The script validates Node.js and `pnpm`/Corepack before starting.
-- With no arguments, the script starts `pnpm exec vite --host 127.0.0.1 --port 5173`.
+- With no arguments, the script starts `pnpm exec vite --host 0.0.0.0 --port 5173`.
+- The startup output shows the local URL and tells the user to use the host computer LAN IP from another device.
+- A browser on another LAN device can load the app when the OS firewall and router allow the port.
 - With arguments, the script passes them directly to `pnpm exec vite`.
 - On failure, the command window remains open and displays the exit code.
 
