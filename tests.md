@@ -355,7 +355,6 @@ Composer attachment menu places the `Fast mode` switch under the mode controls i
 1. Dev server running (`pnpm run dev`)
 2. A thread or new chat is open with the composer visible
 3. Light theme and dark theme both available from the appearance switcher
-4. The selected model supports Fast mode (`gpt-5.4`)
 
 #### Steps
 1. In light theme, open the composer `+` attachment menu.
@@ -364,13 +363,14 @@ Composer attachment menu places the `Fast mode` switch under the mode controls i
 4. Confirm `~/.codex/config.toml` records `service_tier = "fast"` and `features.fast_mode = true`.
 5. Click `Fast mode` again and confirm the switch turns off.
 6. Open sidebar Settings and confirm there is no separate `Fast mode` row there.
-7. Switch to dark theme and repeat steps 1-6.
+7. Change the selected model away from `gpt-5.4` and confirm `Fast mode` still appears in the composer `+` menu.
+8. Switch to dark theme and repeat steps 1-7.
 
 #### Expected Results
 - Fast mode is toggled from the composer mode menu, directly below the regular/plan mode control.
 - The setting uses the existing backend persistence path for the composer Fast mode toggle.
 - The switch disables or pulses while the speed setting is being saved.
-- The composer menu remains readable in both light and dark themes, and Settings does not expose a duplicate Fast mode entry.
+- The composer menu remains readable in both light and dark themes, Settings does not expose a duplicate Fast mode entry, and the Fast mode entry does not disappear when a non-`gpt-5.4` or provider-wrapped model is selected.
 
 #### Rollback/Cleanup
 - Turn Fast mode off from the composer attachment menu to restore standard speed.

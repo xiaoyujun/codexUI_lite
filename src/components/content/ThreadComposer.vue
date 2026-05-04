@@ -208,7 +208,6 @@
               />
             </button>
             <button
-              v-if="isFastModeSupported"
               class="thread-composer-attach-setting"
               type="button"
               role="switch"
@@ -650,9 +649,8 @@ const standaloneFileAttachments = computed(() => {
 })
 const isInteractionDisabled = computed(() => props.disabled || !props.activeThreadId)
 const isComposerConfigDisabled = computed(() => props.disabled || !props.activeThreadId)
-const isFastModeSupported = computed(() => props.selectedModel.trim() === 'gpt-5.4')
 const showFastModeModelIcon = computed(() =>
-  props.selectedSpeedMode === 'fast' && isFastModeSupported.value,
+  props.selectedSpeedMode === 'fast',
 )
 const isSpeedToggleDisabled = computed(() =>
   isInteractionDisabled.value || props.isUpdatingSpeedMode === true,

@@ -1,5 +1,10 @@
 # Log
 
+## [2026-05-04] update | always-visible composer Fast mode entry
+- Updated source: `raw/features/settings-fast-mode-entry.md`.
+- Updated wiki page: `concepts/settings-and-model-controls.md`.
+- Documents: composer Fast mode entry remains visible regardless of selected model id, including provider-wrapped model ids.
+
 ## [2026-05-04] update | composer Fast mode placement
 - Updated source: `raw/features/settings-fast-mode-entry.md`.
 - Updated wiki page: `concepts/settings-and-model-controls.md`.

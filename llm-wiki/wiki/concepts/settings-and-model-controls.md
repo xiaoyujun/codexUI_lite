@@ -4,7 +4,7 @@ The web UI keeps persistent app preferences in sidebar Settings and per-turn mod
 
 ## Fast Mode
 
-Fast mode is persisted through `config/batchWrite`, setting `features.fast_mode = true` and using `service_tier = "fast"` while enabled. The Fast mode switch is placed in the composer attachment menu under the regular/plan mode control, and sidebar Settings does not expose a duplicate Fast mode row.
+Fast mode is persisted through `config/batchWrite`, setting `features.fast_mode = true` and using `service_tier = "fast"` while enabled. The Fast mode switch is placed in the composer attachment menu under the regular/plan mode control, remains visible across normal and provider-wrapped model selections, and sidebar Settings does not expose a duplicate Fast mode row.
 
 Source: [settings-fast-mode-entry.md](../../raw/features/settings-fast-mode-entry.md)
 

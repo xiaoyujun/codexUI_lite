@@ -10,3 +10,4 @@ Date: 2026-05-04
 - Disabling Fast mode clears `service_tier` back to standard behavior.
 - The Fast mode switch belongs in the composer attachment menu with the mode controls, not in sidebar Settings.
 - In the composer attachment menu, the regular/plan mode control appears before `Fast mode`.
+- The Fast mode entry remains visible regardless of the selected model id, including provider-wrapped model ids, because the speed setting is persisted as global Codex config rather than as a per-model UI-only state.
