@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Codex UI</string>
+    <string name="title_activity_main">Codex UI</string>
+    <string name="package_name">com.codexui.app</string>
+    <string name="custom_url_scheme">com.codexui.app</string>
+</resources>

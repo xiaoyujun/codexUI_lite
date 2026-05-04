@@ -59,6 +59,7 @@ import type {
 } from '../types/codex'
 import { getPathParent, isProjectlessChatPath, normalizePathForUi, toProjectName } from '../pathUtils.js'
 import { isCcSwitchCodexModelSelection } from '../ccSwitchCodexModel'
+import { notifyTurnCompleted } from '../native/completionNotifications'
 
 function flattenThreads(groups: UiProjectGroup[]): UiThread[] {
   return groups.flatMap((group) => group.threads)
@@ -1930,6 +1931,14 @@ export function useDesktopState() {
     }))
   }
 
+  function readThreadNotificationTitle(threadId: string): string {
+    const cached = threadTitleById.value[threadId]?.trim()
+    if (cached) return cached
+
+    const thread = allThreads.value.find((candidate) => candidate.id === threadId)
+    return thread?.title?.trim() || thread?.cwd?.trim() || 'Codex thread'
+  }
+
   function getThreadPendingRequests(threadId: string): UiServerRequest[] {
     if (!threadId) return []
     return Array.isArray(pendingServerRequestsByThreadId.value[threadId])
@@ -3599,6 +3608,11 @@ export function useDesktopState() {
         clearPendingTurnRequest(completedTurn.threadId)
         scheduleQueueStateRefresh(completedTurn.threadId)
       }
+      void notifyTurnCompleted({
+        threadTitle: readThreadNotificationTitle(completedTurn.threadId),
+        durationMs,
+        failed: Boolean(turnErrorMessage),
+      })
     }
 
     if (turnErrorMessage) {

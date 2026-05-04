@@ -50,6 +50,9 @@
     "build:frontend": "vue-tsc --noEmit && vite build",
     "build:cli": "tsup",
     "build": "pnpm run build:frontend && pnpm run build:cli",
+    "android:sync": "cap sync android",
+    "android:build:debug": "npm run build:frontend && cap sync android && cd android && ./gradlew assembleDebug --no-daemon --stacktrace",
+    "android:build:release": "npm run build:frontend && cap sync android && cd android && ./gradlew assembleRelease --no-daemon --stacktrace",
     "postinstall": "node scripts/fix-pty-native-build.cjs",
     "test:unit": "vitest run",
     "preview": "vite preview",
@@ -58,6 +61,9 @@
     "profile:thread": "PROFILE_ROUTE='#/thread/019da7c0-4e12-7a91-837c-f7c11cc8ab6c' node scripts/profile-browser-runtime.cjs"
   },
   "dependencies": {
+    "@capacitor/android": "8.3.1",
+    "@capacitor/core": "8.3.1",
+    "@capacitor/local-notifications": "8.0.2",
     "@composio/client": "0.1.0-alpha.66",
     "@xterm/addon-fit": "^0.11.0",
     "@xterm/xterm": "^6.0.0",
@@ -72,6 +78,7 @@
     "node-pty": "^1.1.0"
   },
   "devDependencies": {
+    "@capacitor/cli": "8.3.1",
     "@playwright/test": "^1.59.1",
     "@tailwindcss/vite": "^4.1.18",
     "@types/express": "^5.0.0",
