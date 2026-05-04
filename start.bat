@@ -53,6 +53,11 @@ echo Starting codexui from: %CD%
 if "%~1"=="" (
   echo Local URL: http://localhost:5173
   echo LAN URL: use http://^<this-computer-LAN-IP^>:5173 from another device.
+  if /I not "%CODEXUI_HECLOUD_TUNNEL%"=="0" (
+    powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\start-hecloud-tunnel.ps1" -LocalPort 5173 -RemotePort 5173 -SshHost 38.76.162.141 -SshUser root -SshPort 22
+  )
+  echo Hecloud URL: http://38.76.162.141:5173
+  echo Set CODEXUI_HECLOUD_TUNNEL=0 to skip the Hecloud reverse tunnel.
   echo Tip: pass Vite args after the script name, for example:
   echo   start.bat --host 127.0.0.1 --port 4173
   call %PNPM_CMD% exec vite --host 0.0.0.0 --port 5173

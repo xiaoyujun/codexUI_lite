@@ -420,19 +420,25 @@ Root-level `start.bat` launches the codexui development server on Windows and al
 1. Windows command prompt or double-click access to the repository root
 2. Node.js 18 or newer available in `PATH`
 3. `pnpm` available in `PATH`, or Corepack available with Node.js
+4. For Hecloud remote access, `C:\Users\Administrator\.ssh\codexui_hecloud_ed25519` exists and the Hecloud sshd allows reverse forwarding
 
 #### Steps
 1. From the repository root, run `start.bat --help`.
 2. Confirm the script changes into the repository root automatically.
 3. Confirm the script invokes Vite through `pnpm exec vite` and forwards the `--help` argument.
-4. Optionally run `start.bat` when a live development server is needed.
-5. From another device on the same LAN, open `http://<this-computer-LAN-IP>:5173`.
-6. If a loopback-only development server is needed, run `start.bat --host 127.0.0.1 --port 4173`.
+4. Run `start.bat` when a live development server is needed.
+5. Confirm `output\tunnels\hecloud-5173.log` records the reverse tunnel startup.
+6. On Hecloud, run `ss -ltnp | grep ':5173 '` and confirm sshd is listening on `*:5173`.
+7. From another device on the same LAN, open `http://<this-computer-LAN-IP>:5173`.
+8. From a remote browser, open `http://38.76.162.141:5173`.
+9. If a loopback-only development server is needed, run `set CODEXUI_HECLOUD_TUNNEL=0` and then `start.bat --host 127.0.0.1 --port 4173`.
 
 #### Expected Results
 - The script validates Node.js and `pnpm`/Corepack before starting.
 - With no arguments, the script starts `pnpm exec vite --host 0.0.0.0 --port 5173`.
 - The startup output shows the local URL and tells the user to use the host computer LAN IP from another device.
+- The startup output shows the Hecloud URL and starts a background SSH reverse tunnel unless `CODEXUI_HECLOUD_TUNNEL=0`.
+- Hecloud port `5173` forwards back to the local Windows app on `127.0.0.1:5173`.
 - A browser on another LAN device can load the app when the OS firewall and router allow the port.
 - With arguments, the script passes them directly to `pnpm exec vite`.
 - On failure, the command window remains open and displays the exit code.
