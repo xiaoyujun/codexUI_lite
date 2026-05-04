@@ -54,7 +54,12 @@
       <p v-else-if="filteredEntries.length === 0" class="project-files-muted">{{ t('No files found') }}</p>
 
       <ul v-else class="project-files-list">
-        <li v-for="entry in filteredEntries" :key="entry.path" class="project-files-row">
+        <li
+          v-for="entry in filteredEntries"
+          :key="entry.path"
+          class="project-files-row"
+          :data-emoji-open="isEmojiPickerOpen('list', entry.path) ? 'true' : 'false'"
+        >
           <button
             class="project-files-entry"
             type="button"
@@ -76,6 +81,36 @@
               </span>
             </span>
           </button>
+          <div v-if="canUseTitleEmoji(entry)" class="project-files-emoji-menu-area project-files-entry-tools">
+            <button
+              class="project-files-emoji-trigger project-files-entry-emoji"
+              type="button"
+              :title="t('Add emoji')"
+              :aria-expanded="isEmojiPickerOpen('list', entry.path)"
+              :disabled="emojiRenamePath === entry.path"
+              @click.stop="toggleEmojiPicker('list', entry.path)"
+            >
+              <span aria-hidden="true">{{ leadingTitleEmoji(entry.name) || '🙂' }}</span>
+            </button>
+            <div
+              v-if="isEmojiPickerOpen('list', entry.path)"
+              class="project-files-emoji-popover"
+              role="menu"
+              :aria-label="t('Choose emoji')"
+            >
+              <button
+                v-for="emoji in TITLE_EMOJI_OPTIONS"
+                :key="emoji"
+                class="project-files-emoji-option"
+                type="button"
+                role="menuitem"
+                :disabled="emojiRenamePath === entry.path"
+                @click.stop="renameEntryWithEmoji(entry, emoji)"
+              >
+                {{ emoji }}
+              </button>
+            </div>
+          </div>
         </li>
       </ul>
     </aside>
@@ -104,7 +139,39 @@
       <template v-else>
         <header class="project-files-editor-header">
           <div class="project-files-editor-title-wrap">
-            <p class="project-files-editor-title" :title="activeFilePath">{{ activeFileName }}</p>
+            <div class="project-files-editor-title-row">
+              <div v-if="activeFile?.markdown" class="project-files-emoji-menu-area project-files-title-emoji-wrap">
+                <button
+                  class="project-files-emoji-trigger project-files-title-emoji"
+                  type="button"
+                  :title="t('Add emoji')"
+                  :aria-expanded="isEmojiPickerOpen('editor', activeFilePath)"
+                  :disabled="emojiRenamePath === activeFilePath"
+                  @click.stop="toggleEmojiPicker('editor', activeFilePath)"
+                >
+                  <span aria-hidden="true">{{ activeTitleEmoji || '🙂' }}</span>
+                </button>
+                <div
+                  v-if="isEmojiPickerOpen('editor', activeFilePath)"
+                  class="project-files-emoji-popover project-files-title-emoji-popover"
+                  role="menu"
+                  :aria-label="t('Choose emoji')"
+                >
+                  <button
+                    v-for="emoji in TITLE_EMOJI_OPTIONS"
+                    :key="emoji"
+                    class="project-files-emoji-option"
+                    type="button"
+                    role="menuitem"
+                    :disabled="emojiRenamePath === activeFilePath"
+                    @click.stop="renameActiveMarkdownWithEmoji(emoji)"
+                  >
+                    {{ emoji }}
+                  </button>
+                </div>
+              </div>
+              <p class="project-files-editor-title" :title="activeFilePath">{{ activeFileName }}</p>
+            </div>
             <p class="project-files-editor-subtitle" :title="activeFilePath">{{ activeFileRelativePath }}</p>
           </div>
           <div class="project-files-editor-actions">
@@ -174,10 +241,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import {
   listLocalProjectFiles,
   readLocalProjectTextFile,
+  renameLocalProjectEntry,
   saveLocalProjectTextFile,
   type LocalProjectFileEntry,
   type LocalProjectFileListing,
@@ -225,8 +293,34 @@ const directoryError = ref('')
 const fileError = ref('')
 const saveStatus = ref('')
 const viewMode = ref<'preview' | 'edit'>('preview')
+const emojiPickerTarget = ref<{ location: EmojiPickerLocation; path: string } | null>(null)
+const emojiRenamePath = ref('')
 let directoryRequestId = 0
 let fileRequestId = 0
+
+type EmojiPickerLocation = 'list' | 'editor'
+
+const TITLE_EMOJI_OPTIONS = [
+  '✨',
+  '📌',
+  '🧠',
+  '🚀',
+  '✅',
+  '🔥',
+  '💡',
+  '🧪',
+  '🛠️',
+  '📁',
+  '📄',
+  '📝',
+  '🎯',
+  '⚙️',
+  '🔒',
+  '⭐',
+]
+
+const TITLE_EMOJI_PREFIX_RE =
+  /^((?:[\p{Extended_Pictographic}\u2600-\u27BF](?:\uFE0F|\u20E3)?(?:\u200D[\p{Extended_Pictographic}\u2600-\u27BF](?:\uFE0F|\u20E3)?)*|[0-9#*]\uFE0F?\u20E3))\s+/u
 
 const rootPath = computed(() => normalizePathForUi(props.rootPath).trim())
 const currentDirectory = computed(() => normalizePathForUi(props.directoryPath || props.rootPath).trim())
@@ -244,6 +338,7 @@ const relativeDirectoryLabel = computed(() => {
 })
 
 const activeFileName = computed(() => getPathLeafName(activeFilePath.value) || t('File'))
+const activeTitleEmoji = computed(() => leadingTitleEmoji(activeFileName.value))
 const activeFileRelativePath = computed(() => getRelativePath(rootPath.value, activeFilePath.value) || activeFilePath.value)
 const rawFileHref = computed(() => `/codex-local-file?path=${encodeURIComponent(activeFilePath.value)}`)
 const imageFileHref = computed(() => `/codex-local-image?path=${encodeURIComponent(activeFilePath.value)}`)
@@ -289,6 +384,25 @@ watch(
   },
   { immediate: true },
 )
+
+onMounted(() => {
+  if (typeof window !== 'undefined') {
+    window.addEventListener('pointerdown', onProjectFilesWindowPointerDown)
+  }
+})
+
+onBeforeUnmount(() => {
+  if (typeof window !== 'undefined') {
+    window.removeEventListener('pointerdown', onProjectFilesWindowPointerDown)
+  }
+})
+
+function onProjectFilesWindowPointerDown(event: PointerEvent): void {
+  const target = event.target
+  if (!(target instanceof Element)) return
+  if (target.closest('.project-files-emoji-menu-area')) return
+  closeEmojiPicker()
+}
 
 async function loadDirectory(): Promise<void> {
   const root = rootPath.value
@@ -358,6 +472,90 @@ async function saveFile(): Promise<void> {
   } finally {
     isSaving.value = false
   }
+}
+
+function canUseTitleEmoji(entry: LocalProjectFileEntry): boolean {
+  return entry.isDirectory || entry.markdown
+}
+
+function isEmojiPickerOpen(location: EmojiPickerLocation, path: string): boolean {
+  const target = emojiPickerTarget.value
+  return target?.location === location && target.path === path
+}
+
+function toggleEmojiPicker(location: EmojiPickerLocation, path: string): void {
+  if (!path) return
+  emojiPickerTarget.value = isEmojiPickerOpen(location, path) ? null : { location, path }
+}
+
+function closeEmojiPicker(): void {
+  emojiPickerTarget.value = null
+}
+
+function leadingTitleEmoji(value: string): string {
+  const match = value.trimStart().match(TITLE_EMOJI_PREFIX_RE)
+  return match?.[1] ?? ''
+}
+
+function removeLeadingTitleEmoji(value: string): string {
+  return value.trimStart().replace(TITLE_EMOJI_PREFIX_RE, '')
+}
+
+function splitMarkdownExtension(name: string): { title: string; extension: string } {
+  const extension = name.match(/(\.md|\.markdown|\.mdx)$/iu)?.[1] ?? ''
+  if (!extension) return { title: name, extension: '' }
+  return {
+    title: name.slice(0, -extension.length),
+    extension,
+  }
+}
+
+function withTitleEmoji(name: string, emoji: string, preserveMarkdownExtension: boolean): string {
+  const parts = preserveMarkdownExtension ? splitMarkdownExtension(name) : { title: name, extension: '' }
+  const title = removeLeadingTitleEmoji(parts.title).trim()
+  return `${emoji} ${title || t('Untitled')}${parts.extension}`
+}
+
+async function renamePathWithEmoji(
+  path: string,
+  currentName: string,
+  emoji: string,
+  preserveMarkdownExtension: boolean,
+  location: EmojiPickerLocation,
+): Promise<void> {
+  const root = rootPath.value
+  const nextName = withTitleEmoji(currentName, emoji, preserveMarkdownExtension)
+  if (!root || !path || nextName === currentName) {
+    closeEmojiPicker()
+    return
+  }
+
+  emojiRenamePath.value = path
+  directoryError.value = ''
+  if (location === 'editor') fileError.value = ''
+  try {
+    const renamed = await renameLocalProjectEntry(root, path, nextName)
+    closeEmojiPicker()
+    await loadDirectory()
+    if (location === 'editor' || path === activeFilePath.value) {
+      emit('open-file', renamed.path)
+    }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : t('Failed to rename project entry')
+    if (location === 'editor') fileError.value = message
+    else directoryError.value = message
+  } finally {
+    if (emojiRenamePath.value === path) emojiRenamePath.value = ''
+  }
+}
+
+async function renameEntryWithEmoji(entry: LocalProjectFileEntry, emoji: string): Promise<void> {
+  await renamePathWithEmoji(entry.path, entry.name, emoji, entry.markdown, 'list')
+}
+
+async function renameActiveMarkdownWithEmoji(emoji: string): Promise<void> {
+  if (!activeFile.value?.markdown) return
+  await renamePathWithEmoji(activeFilePath.value, activeFileName.value, emoji, true, 'editor')
 }
 
 function onEntryClick(entry: LocalProjectFileEntry): void {
@@ -734,11 +932,11 @@ function renderMarkdown(markdown: string, baseFilePath: string): string {
 }
 
 .project-files-row {
-  @apply m-0 p-0;
+  @apply relative m-0 flex min-w-0 items-center gap-1 p-0;
 }
 
 .project-files-entry {
-  @apply flex w-full min-w-0 items-center gap-2 rounded-lg border border-transparent bg-transparent px-2 py-2 text-left transition hover:border-zinc-200 hover:bg-white;
+  @apply flex min-w-0 flex-1 items-center gap-2 rounded-lg border border-transparent bg-transparent px-2 py-2 text-left transition hover:border-zinc-200 hover:bg-white;
 }
 
 .project-files-entry[data-selected='true'] {
@@ -763,6 +961,41 @@ function renderMarkdown(markdown: string, baseFilePath: string): string {
 
 .project-files-entry-meta {
   @apply mt-0.5 block truncate text-[11px] text-zinc-500;
+}
+
+.project-files-entry-tools,
+.project-files-title-emoji-wrap {
+  @apply relative shrink-0;
+}
+
+.project-files-entry-tools {
+  @apply opacity-75 transition-opacity;
+}
+
+.project-files-row:hover .project-files-entry-tools,
+.project-files-row:focus-within .project-files-entry-tools,
+.project-files-row[data-emoji-open='true'] .project-files-entry-tools {
+  @apply opacity-100;
+}
+
+.project-files-emoji-trigger {
+  @apply inline-flex h-7 w-7 items-center justify-center rounded-md border border-zinc-200 bg-white text-base leading-none text-zinc-700 shadow-sm transition hover:bg-zinc-100 disabled:cursor-default disabled:opacity-45;
+}
+
+.project-files-entry-emoji {
+  @apply mt-0.5;
+}
+
+.project-files-emoji-popover {
+  @apply absolute right-0 top-full z-30 mt-1 grid w-56 grid-cols-8 gap-1 rounded-lg border border-zinc-200 bg-white p-2 shadow-xl;
+}
+
+.project-files-row:nth-last-child(-n + 4) .project-files-emoji-popover {
+  @apply bottom-full top-auto mb-1 mt-0;
+}
+
+.project-files-emoji-option {
+  @apply flex h-7 w-7 items-center justify-center rounded-md border-0 bg-transparent text-base leading-none transition hover:bg-zinc-100 disabled:cursor-default disabled:opacity-45;
 }
 
 .project-files-editor {
@@ -811,6 +1044,18 @@ function renderMarkdown(markdown: string, baseFilePath: string): string {
 
 .project-files-editor-title-wrap {
   @apply min-w-0;
+}
+
+.project-files-editor-title-row {
+  @apply flex min-w-0 items-center gap-2;
+}
+
+.project-files-title-emoji {
+  @apply h-8 w-8;
+}
+
+.project-files-title-emoji-popover {
+  @apply left-0 right-auto;
 }
 
 .project-files-editor-title {
@@ -965,8 +1210,14 @@ function renderMarkdown(markdown: string, baseFilePath: string): string {
 :root.dark .project-files-search-wrap,
 :root.dark .project-files-recent-entry,
 :root.dark .project-files-icon-button,
-:root.dark .project-files-action {
+:root.dark .project-files-action,
+:root.dark .project-files-emoji-trigger,
+:root.dark .project-files-emoji-popover {
   @apply border-zinc-700 bg-zinc-900 text-zinc-200 hover:bg-zinc-800;
+}
+
+:root.dark .project-files-emoji-option {
+  @apply text-zinc-100 hover:bg-zinc-800;
 }
 
 :root.dark .project-files-search,

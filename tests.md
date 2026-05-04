@@ -76,6 +76,35 @@ This file tracks manual regression and feature verification steps.
 #### Rollback/Cleanup
 - Revert any manual text edits made to sample project files.
 
+### Feature: Project files emoji title shortcuts
+
+#### Prerequisites
+- App is running from this repository.
+- At least one local project exists in the sidebar.
+- The project contains one disposable folder and one disposable Markdown file.
+- Light and dark themes are both available from Settings.
+
+#### Steps
+1. In light theme, hover the disposable folder row in the project files view.
+2. Click the emoji button on the folder row and select an emoji.
+3. Confirm the folder is renamed with that emoji prefix and remains openable from the list.
+4. Hover the disposable Markdown file row and select a different emoji from its emoji button.
+5. Confirm the Markdown filename is renamed with the emoji prefix while keeping its `.md`/Markdown extension.
+6. Open the Markdown file, click the emoji button next to the editor title, and select another emoji.
+7. Confirm the editor route, title, preview, edit mode, and save action continue to work after the rename.
+8. Click outside an open emoji picker and confirm it closes.
+9. Switch to dark theme and repeat steps 1 through 8.
+
+#### Expected Results
+- Emoji shortcuts are shown only for folders and Markdown files in the project files list.
+- Selecting an emoji replaces any existing leading title emoji instead of stacking duplicates.
+- Markdown renames preserve the file extension and keep the file selected after editor-title changes.
+- Picker popovers, row hover states, title buttons, and error text remain readable in light and dark themes.
+- Folder navigation stays constrained to the project root after emoji renames.
+
+#### Rollback/Cleanup
+- Rename the disposable folder and Markdown file back to their original names, or delete the disposable test entries.
+
 ### Feature: Thread heartbeat automations
 
 #### Prerequisites
