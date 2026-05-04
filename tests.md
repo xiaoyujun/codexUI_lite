@@ -310,10 +310,10 @@ This file tracks manual regression and feature verification steps.
 
 ---
 
-### Android APK shell and completion notifications
+### Android APK shell, server selection, and completion notifications
 
 #### Feature/Change Name
-Capacitor Android packaging for Codex UI, with local notifications when a Codex turn completes.
+Capacitor Android packaging for Codex UI, runtime server address selection, and local notifications when a Codex turn completes.
 
 #### Prerequisites/Setup
 1. Android build environment has Node 22+, JDK 21, Android SDK platform 36, and Build Tools 36.
@@ -323,22 +323,28 @@ Capacitor Android packaging for Codex UI, with local notifications when a Codex 
 
 #### Steps
 1. Run `npm run build:frontend`.
-2. Run `CAPACITOR_SERVER_URL=http://38.76.162.141:18923 npx cap sync android`.
+2. Run `npx cap sync android`.
 3. Run `cd android && ./gradlew assembleDebug --no-daemon --stacktrace`.
 4. Install `android/app/build/outputs/apk/debug/app-debug.apk` on an Android device.
-5. Open the app, grant notification permission when Android asks, and verify the codexui route loads from the configured server.
-6. In light theme, start a Codex turn, background the app before the turn finishes, and wait for completion.
-7. Confirm an Android notification appears with the completed thread title and duration.
-8. Reopen the app, switch to dark theme, start another Codex turn, background the app, and repeat the completion check.
+5. Open the app and verify the native connector screen appears with a server address field, `Connect`, and `Use default`.
+6. Enter `http://38.76.162.141:18923`, tap `Connect`, and verify the codexui route loads from that server.
+7. Close and reopen the APK, verify the connector screen remembers the last address, then connect again.
+8. Grant notification permission when Android asks.
+9. In light theme, start a Codex turn, background the app before the turn finishes, and wait for completion.
+10. Confirm an Android notification appears with the completed thread title and duration.
+11. Reopen the app, switch to dark theme, start another Codex turn, background the app, and repeat the completion check.
 
 #### Expected Results
 - `npm run build:frontend` passes TypeScript and Vite production build checks.
 - `npx cap sync android` finds the Local Notifications plugin and writes the Android configuration.
 - Gradle produces a debug APK without build errors.
-- The APK opens the configured codexui server URL.
+- The APK opens a built-in connection screen before loading codexui.
+- The address field accepts `http://` and `https://` URLs and normalizes missing schemes to `http://`.
+- The selected server address is remembered across app launches.
+- The APK navigates inside the WebView to the selected codexui server URL.
 - Android notification permission is requested in the native app.
 - Completed turns trigger a local notification in both light-theme and dark-theme usage.
-- Theme surfaces remain readable after returning from a notification in both light and dark themes.
+- The connector screen and loaded app remain readable in light and dark theme/system appearance.
 
 #### Rollback/Cleanup
 - Uninstall the debug APK from the Android test device if no longer needed.
