@@ -1,5 +1,11 @@
 # Log
 
+## [2026-05-04] ingest | settings fast mode entry
+- Added source: `raw/features/settings-fast-mode-entry.md`.
+- Created wiki page: `concepts/settings-and-model-controls.md`.
+- Documents: sidebar Settings now exposes a direct Fast mode switch sharing the existing `config/batchWrite` speed-mode persistence.
+- Updated `index.md`.
+
 ## [2026-05-04] ingest | cc-switch thread model display preservation
 - Added source: `raw/fixes/cc-switch-thread-model-display-preservation.md`.
 - Updated wiki page: `concepts/cc-switch-codex-provider-models.md`.

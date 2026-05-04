@@ -206,6 +206,25 @@
                 <span class="sidebar-settings-label">{{ t('Appearance') }}</span>
                 <span class="sidebar-settings-value">{{ darkMode === 'system' ? t('System') : darkMode === 'dark' ? t('Dark') : t('Light') }}</span>
               </button>
+              <button
+                class="sidebar-settings-row"
+                type="button"
+                role="switch"
+                :aria-checked="selectedSpeedMode === 'fast'"
+                :aria-label="`${t('Fast mode')} ${selectedSpeedMode === 'fast' ? t('enabled') : t('disabled')}`"
+                :title="settingsSpeedModeDescription"
+                :disabled="isUpdatingSpeedMode"
+                @click="toggleSettingsSpeedMode"
+              >
+                <span class="sidebar-settings-label">{{ t('Fast mode') }}</span>
+                <span
+                  class="sidebar-settings-toggle"
+                  :class="{
+                    'is-on': selectedSpeedMode === 'fast',
+                    'is-busy': isUpdatingSpeedMode,
+                  }"
+                />
+              </button>
               <div class="sidebar-settings-row sidebar-settings-row--select" :title="t('Choose the interface language for the app.')">
                 <span class="sidebar-settings-label">{{ t('UI language') }}</span>
                 <select
@@ -1757,6 +1776,13 @@ const existingFolderFilteredEntries = computed(() => {
 })
 const darkModeMediaQuery = typeof window !== 'undefined' ? window.matchMedia('(prefers-color-scheme: dark)') : null
 const chatWidthLabel = computed(() => t(CHAT_WIDTH_PRESETS[chatWidth.value].label))
+const settingsSpeedModeDescription = computed(() => (
+  isUpdatingSpeedMode.value
+    ? t('Saving speed setting...')
+    : selectedSpeedMode.value === 'fast'
+      ? t('About 1.5x faster, with credits used at 2x')
+      : t('Default speed with normal credit usage')
+))
 const terminalShortcutLabel = computed(() => {
   if (typeof navigator !== 'undefined' && /mac|iphone|ipad|ipod/i.test(navigator.platform)) {
     return '⌘J'
@@ -3494,6 +3520,11 @@ function onSelectSpeedMode(mode: SpeedMode): void {
   void updateSelectedSpeedMode(mode)
 }
 
+function toggleSettingsSpeedMode(): void {
+  if (isUpdatingSpeedMode.value) return
+  void updateSelectedSpeedMode(selectedSpeedMode.value === 'fast' ? 'standard' : 'fast')
+}
+
 function onInterruptTurn(): void {
   void interruptSelectedThreadTurn()
 }
@@ -4963,6 +4994,10 @@ async function loadWorktreeBranches(sourceCwd: string): Promise<void> {
   @apply flex items-center justify-between w-full px-3 py-2.5 text-sm text-zinc-700 border-0 bg-transparent transition hover:bg-zinc-50 cursor-pointer;
 }
 
+.sidebar-settings-row:disabled {
+  @apply cursor-default opacity-60 hover:bg-transparent;
+}
+
 .sidebar-settings-row--select {
   @apply cursor-default items-center gap-2;
 }
@@ -5242,6 +5277,10 @@ async function loadWorktreeBranches(sourceCwd: string): Promise<void> {
 
 .sidebar-settings-toggle.is-on {
   @apply bg-zinc-800;
+}
+
+.sidebar-settings-toggle.is-busy {
+  @apply animate-pulse;
 }
 
 .sidebar-settings-toggle.is-on::after {
