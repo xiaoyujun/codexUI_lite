@@ -30,6 +30,11 @@ import { handleOpenRouterProxyRequest } from './openRouterProxy.js'
 import { handleZenProxyRequest } from './zenProxy.js'
 import { handleCustomEndpointProxyRequest } from './customEndpointProxy.js'
 import { ThreadTerminalManager } from './terminalManager.js'
+import {
+  listCcSwitchCodexModelOptions,
+  resolveCcSwitchCodexModelOnlyParams,
+  resolveCcSwitchCodexThreadConfigParams,
+} from './ccSwitchCodex.js'
 import { getSpawnInvocation } from '../utils/commandInvocation.js'
 import {
   resolveCodexCommand,
@@ -5232,7 +5237,12 @@ export function createCodexBridgeMiddleware(): CodexBridgeMiddleware {
           return
         }
 
-        const rpcResult = await appServer.rpc(body.method, body.params ?? null)
+        const rpcParams = body.method === 'thread/start' || body.method === 'thread/fork'
+          ? await resolveCcSwitchCodexThreadConfigParams(body.params ?? null)
+          : body.method === 'turn/start'
+            ? await resolveCcSwitchCodexModelOnlyParams(body.params ?? null)
+            : body.params ?? null
+        const rpcResult = await appServer.rpc(body.method, rpcParams)
         const trimmedResult = trimThreadTurnsInRpcResult(body.method, rpcResult)
         const result = await sanitizeThreadTurnsInlinePayloads(body.method, trimmedResult)
 
@@ -5625,7 +5635,11 @@ export function createCodexBridgeMiddleware(): CodexBridgeMiddleware {
           // No free-mode state — proceed normally
         }
         const data = await readProviderBackedModelIds(appServer)
-        setJson(res, 200, data)
+        const ccSwitchModels = await listCcSwitchCodexModelOptions()
+        setJson(res, 200, {
+          ...data,
+          data: [...data.data, ...ccSwitchModels.filter((model) => !data.data.includes(model))],
+        })
         return
       }
 

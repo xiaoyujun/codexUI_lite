@@ -310,6 +310,38 @@ This file tracks manual regression and feature verification steps.
 
 ---
 
+### cc-switch Codex provider model selection
+
+#### Feature/Change Name
+Composer model picker can start a new chat with a Codex provider configuration read from `cc-switch`.
+
+#### Prerequisites/Setup
+1. Dev server running (`pnpm run dev`)
+2. `cc-switch` has at least one Codex provider saved in `~/.cc-switch/cc-switch.db`
+3. The saved provider has `settings_config.config` with `model` and `model_provider`
+4. Light theme and dark theme both available from the appearance switcher
+
+#### Steps
+1. In light theme, open the new-chat composer.
+2. Open the model dropdown and search for the provider name from `cc-switch`.
+3. Select the `cc-switch` provider/model option.
+4. Send a first message to create a new chat.
+5. Confirm the chat starts successfully and the created thread uses the selected provider's model.
+6. Confirm `~/.codex/config.toml` is not rewritten just by selecting the model option.
+7. Switch to dark theme and repeat steps 1-5.
+
+#### Expected Results
+- The model dropdown includes one option per usable `cc-switch` Codex provider.
+- The option label shows the `cc-switch` provider name and model.
+- Starting a new chat resolves the selected provider on the server side, including shared `cc-switch` common Codex config and provider auth.
+- Provider auth is not exposed to the browser model list payload.
+- The model dropdown remains readable in both light and dark themes.
+
+#### Rollback/Cleanup
+- Switch the composer model back to the preferred default model if a test provider was selected.
+
+---
+
 ### Windows startup batch script
 
 #### Feature/Change Name

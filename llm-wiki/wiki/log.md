@@ -1,5 +1,11 @@
 # Log
 
+## [2026-05-04] ingest | cc-switch Codex provider model picker
+- Added source: `raw/features/cc-switch-codex-provider-models.md`.
+- Created wiki page: `concepts/cc-switch-codex-provider-models.md`.
+- Documents: `cc-switch.db` provider/config source shape, virtual model id encoding, server-side provider config resolution, and new-thread-only picker behavior.
+- Updated `index.md`.
+
 ## [2026-05-02] ingest | Directory Hub Composio and Skills search
 - Added source: `raw/features/directory-hub-composio-skills-search.md`.
 - Created wiki page: `concepts/directory-hub-composio-skills.md`.

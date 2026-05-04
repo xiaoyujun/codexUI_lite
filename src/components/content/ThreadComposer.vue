@@ -382,6 +382,10 @@ import { useDictation } from '../../composables/useDictation'
 import { useMobile } from '../../composables/useMobile'
 import { useUiLanguage } from '../../composables/useUiLanguage'
 import {
+  decodeCcSwitchCodexModelSelection,
+  isCcSwitchCodexModelSelection,
+} from '../../ccSwitchCodexModel'
+import {
   createComposerPrompt,
   getComposerPrompts,
   removeComposerPrompt,
@@ -565,14 +569,26 @@ const reasoningOptions: Array<{ value: ReasoningEffort; label: string }> = [
   { value: 'high', label: 'High' },
   { value: 'xhigh', label: 'Extra high' },
 ]
-function formatModelLabel(modelId: string): string {
+function formatPlainModelLabel(modelId: string): string {
   return modelId.trim().replace(/^gpt/i, 'GPT')
 }
 
+function formatModelLabel(modelId: string): string {
+  const ccSwitchSelection = decodeCcSwitchCodexModelSelection(modelId.trim())
+  if (ccSwitchSelection) {
+    const providerName = ccSwitchSelection.providerName || 'cc-switch'
+    return `${providerName} - ${formatPlainModelLabel(ccSwitchSelection.model)}`
+  }
+  return formatPlainModelLabel(modelId)
+}
+
 const modelOptions = computed(() =>
-  props.models.map((modelId) => ({ value: modelId, label: formatModelLabel(modelId) })),
+  props.models
+    .filter((modelId) => isNewThreadComposer.value || !isCcSwitchCodexModelSelection(modelId))
+    .map((modelId) => ({ value: modelId, label: formatModelLabel(modelId) })),
 )
 const isPlanModeSelected = computed(() => props.selectedCollaborationMode === 'plan')
+const isNewThreadComposer = computed(() => props.activeThreadId.trim() === '__new-thread__')
 
 const isPlanModeWaitingForModel = computed(() =>
   props.selectedCollaborationMode === 'plan' && props.selectedModel.trim().length === 0,
