@@ -323,7 +323,7 @@ Composer model picker can start a new chat with a Codex provider configuration r
 
 #### Steps
 1. In light theme, open the new-chat composer.
-2. Open the model dropdown and search for the provider name from `cc-switch`.
+2. Open the model dropdown after the initial background model refresh completes, then search for the provider name from `cc-switch`.
 3. Select the `cc-switch` provider/model option.
 4. Send a first message to create a new chat.
 5. Confirm the chat starts successfully and the created thread uses the selected provider's model.
@@ -333,6 +333,7 @@ Composer model picker can start a new chat with a Codex provider configuration r
 #### Expected Results
 - The model dropdown includes one option per usable `cc-switch` Codex provider.
 - The option label shows the `cc-switch` provider name and model.
+- The options are visible from a fresh app load without changing global provider settings first.
 - Starting a new chat resolves the selected provider on the server side, including shared `cc-switch` common Codex config and provider auth.
 - Provider auth is not exposed to the browser model list payload.
 - The model dropdown remains readable in both light and dark themes.

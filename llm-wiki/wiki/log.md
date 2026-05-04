@@ -1,5 +1,11 @@
 # Log
 
+## [2026-05-04] ingest | cc-switch model picker entry visibility
+- Added source: `raw/fixes/cc-switch-model-picker-entry-visibility.md`.
+- Updated wiki page: `concepts/cc-switch-codex-provider-models.md`.
+- Documents: initial background model refresh must include provider-backed models so fresh new-thread composer loads can show `cc-switch-codex:` options.
+- Updated `index.md`.
+
 ## [2026-05-04] ingest | command tested tags
 - Added source: `raw/features/command-tested-tags.md`.
 - Updated wiki page: `concepts/realtime-chat-rendering.md`.

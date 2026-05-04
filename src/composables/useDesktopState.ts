@@ -4258,7 +4258,12 @@ export function useDesktopState() {
   }
 
   async function refreshAll(
-    options: { includeSelectedThreadMessages?: boolean; awaitAncillaryRefreshes?: boolean; providerChanged?: boolean } = {},
+    options: {
+      includeSelectedThreadMessages?: boolean
+      awaitAncillaryRefreshes?: boolean
+      providerChanged?: boolean
+      includeProviderModels?: boolean
+    } = {},
   ) {
     error.value = ''
     const includeSelectedThreadMessages = options.includeSelectedThreadMessages !== false
@@ -4278,7 +4283,7 @@ export function useDesktopState() {
       } else {
         scheduleAncillaryStateRefresh({
           providerChanged: options.providerChanged,
-          includeProviderModels: false,
+          includeProviderModels: options.includeProviderModels === true,
         })
       }
     } catch (unknownError) {

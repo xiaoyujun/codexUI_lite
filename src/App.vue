@@ -4031,6 +4031,7 @@ async function initialize(): Promise<void> {
 
   await refreshAll({
     includeSelectedThreadMessages: route.name === 'thread',
+    includeProviderModels: true,
   })
   void loadAccountsState({ silent: true })
   await applyLaunchProjectPathFromUrl()

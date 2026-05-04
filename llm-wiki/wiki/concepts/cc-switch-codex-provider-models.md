@@ -17,6 +17,10 @@ The frontend receives encoded virtual model ids prefixed with `cc-switch-codex:`
 
 These options are shown only in the new-thread composer because app-server `thread/start` supports `modelProvider` and `config` overrides. Existing `turn/start` calls can change the model, but not the provider config.
 
+The initial app load must include provider-backed models in its background model refresh. Otherwise `/codex-api/provider-models` can return cc-switch options while the new-thread composer still shows only the built-in Codex models.
+
+Source: [cc-switch-model-picker-entry-visibility.md](../../raw/fixes/cc-switch-model-picker-entry-visibility.md)
+
 ## Server Resolution
 
 When a virtual model id reaches `thread/start` or `thread/fork`, the bridge rereads `cc-switch.db`, resolves the selected provider, parses its Codex TOML, merges `common_config_codex`, and forwards:
