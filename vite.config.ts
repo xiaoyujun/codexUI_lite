@@ -1,12 +1,12 @@
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import { createCodexBridgeMiddleware } from "./src/server/codexAppServerBridge";
-import { createDirectoryListingHtml, createTextEditorHtml, decodeBrowsePath, getLocalDirectoryListing, isTextEditableFile, normalizeLocalPath } from "./src/server/localBrowseUi";
+import { createDirectoryListingHtml, createTextEditorHtml, decodeBrowsePath, getLocalDirectoryListing, getLocalProjectDirectoryListing, isImagePath, isMarkdownPath, isTextEditableFile, normalizeLocalPath } from "./src/server/localBrowseUi";
 import tailwindcss from "@tailwindcss/vite";
 import { spawnSync } from "node:child_process";
 import { createReadStream, existsSync, readFileSync } from "node:fs";
-import { stat, writeFile } from "node:fs/promises";
-import { basename, extname, isAbsolute } from "node:path";
+import { readFile, rename, stat, writeFile } from "node:fs/promises";
+import { basename, dirname, extname, isAbsolute, join, relative, resolve } from "node:path";
 import { WebSocketServer, type WebSocket } from "ws";
 import pkg from "./package.json";
 
@@ -32,6 +32,33 @@ function normalizeLocalImagePath(rawPath: string): string {
     }
   }
   return trimmed;
+}
+
+function resolvePathInsideRoot(rootRaw: string, pathRaw: string): { rootPath: string; localPath: string } | null {
+  const rootPath = normalizeLocalPath(rootRaw);
+  const requestedPath = normalizeLocalPath(pathRaw) || rootPath;
+  if (!rootPath || !requestedPath || !isAbsolute(rootPath) || !isAbsolute(requestedPath)) return null;
+
+  const resolvedRoot = resolve(rootPath);
+  const resolvedPath = resolve(requestedPath);
+  const pathFromRoot = relative(resolvedRoot, resolvedPath);
+  if (pathFromRoot === "" || (pathFromRoot && !pathFromRoot.startsWith("..") && !isAbsolute(pathFromRoot))) {
+    return { rootPath: resolvedRoot, localPath: resolvedPath };
+  }
+  return null;
+}
+
+function readShowHiddenQuery(value: string | null): boolean {
+  return ["1", "true", "yes", "on"].includes((value ?? "").toLowerCase());
+}
+
+function normalizeProjectEntryName(value: string): string {
+  return value.trim().replace(/[\\/]+/gu, "").trim();
+}
+
+function isPathWithinRoot(rootPath: string, localPath: string): boolean {
+  const relativePath = relative(rootPath, localPath);
+  return relativePath === "" || (relativePath !== "" && !relativePath.startsWith("..") && !isAbsolute(relativePath));
 }
 
 function getWorktreeName(): string {
@@ -239,7 +266,7 @@ export default defineConfig({
           const url = new URL(req.url, "http://localhost");
           if (url.pathname !== "/codex-local-directories") return next();
 
-          const showHidden = ["1", "true", "yes", "on"].includes((url.searchParams.get("showHidden") ?? "").toLowerCase());
+          const showHidden = readShowHiddenQuery(url.searchParams.get("showHidden"));
           const localPath = normalizeLocalPath(url.searchParams.get("path") ?? "");
           if (!localPath || !isAbsolute(localPath)) {
             res.statusCode = 400;
@@ -265,6 +292,208 @@ export default defineConfig({
             res.statusCode = 404;
             res.setHeader("Content-Type", "application/json");
             res.end(JSON.stringify({ error: "Directory not found." }));
+          }
+        });
+        server.middlewares.use(async (req, res, next) => {
+          if (!req.url || (req.method !== "GET" && req.method !== "HEAD")) return next();
+          const url = new URL(req.url, "http://localhost");
+          if (url.pathname !== "/codex-local-project-tree") return next();
+
+          const resolved = resolvePathInsideRoot(
+            url.searchParams.get("root") ?? "",
+            url.searchParams.get("path") ?? "",
+          );
+          if (!resolved) {
+            res.statusCode = 400;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ error: "Expected absolute project root and in-project path." }));
+            return;
+          }
+
+          try {
+            const fileStat = await stat(resolved.localPath);
+            if (!fileStat.isDirectory()) {
+              res.statusCode = 400;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Expected directory path." }));
+              return;
+            }
+
+            const data = await getLocalProjectDirectoryListing(resolved.localPath, {
+              showHidden: readShowHiddenQuery(url.searchParams.get("showHidden")),
+            });
+            res.statusCode = 200;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ data }));
+          } catch {
+            res.statusCode = 404;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ error: "Directory not found." }));
+          }
+        });
+        server.middlewares.use(async (req, res, next) => {
+          if (!req.url || (req.method !== "GET" && req.method !== "HEAD")) return next();
+          const url = new URL(req.url, "http://localhost");
+          if (url.pathname !== "/codex-local-project-file") return next();
+
+          const resolved = resolvePathInsideRoot(
+            url.searchParams.get("root") ?? "",
+            url.searchParams.get("path") ?? "",
+          );
+          if (!resolved) {
+            res.statusCode = 400;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ error: "Expected absolute project root and in-project file path." }));
+            return;
+          }
+
+          try {
+            const fileStat = await stat(resolved.localPath);
+            if (!fileStat.isFile()) {
+              res.statusCode = 400;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Expected file path." }));
+              return;
+            }
+            const isImage = isImagePath(resolved.localPath);
+            if (!(await isTextEditableFile(resolved.localPath)) && !isImage) {
+              res.statusCode = 415;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "Only text-like files can be opened in the project editor." }));
+              return;
+            }
+
+            const content = isImage ? "" : await readFile(resolved.localPath, "utf8");
+            res.statusCode = 200;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({
+              data: {
+                path: resolved.localPath,
+                content,
+                editable: !isImage,
+                markdown: !isImage && isMarkdownPath(resolved.localPath),
+                image: isImage,
+                size: fileStat.size,
+                mtimeMs: fileStat.mtimeMs,
+              },
+            }));
+          } catch {
+            res.statusCode = 404;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ error: "File not found." }));
+          }
+        });
+        server.middlewares.use(async (req, res, next) => {
+          if (!req.url || req.method !== "PUT") return next();
+          const url = new URL(req.url, "http://localhost");
+          if (url.pathname !== "/codex-local-project-file") return next();
+
+          const resolved = resolvePathInsideRoot(
+            url.searchParams.get("root") ?? "",
+            url.searchParams.get("path") ?? "",
+          );
+          if (!resolved) {
+            res.statusCode = 400;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ error: "Expected absolute project root and in-project file path." }));
+            return;
+          }
+          if (!(await isTextEditableFile(resolved.localPath))) {
+            res.statusCode = 415;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ error: "Only text-like files are editable." }));
+            return;
+          }
+
+          const chunks: Buffer[] = [];
+          req.on("data", (chunk) => chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk)));
+          req.on("end", async () => {
+            try {
+              await writeFile(resolved.localPath, Buffer.concat(chunks).toString("utf8"), "utf8");
+              const fileStat = await stat(resolved.localPath);
+              res.statusCode = 200;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({
+                data: {
+                  path: resolved.localPath,
+                  size: fileStat.size,
+                  mtimeMs: fileStat.mtimeMs,
+                },
+              }));
+            } catch {
+              res.statusCode = 404;
+              res.setHeader("Content-Type", "application/json");
+              res.end(JSON.stringify({ error: "File not found." }));
+            }
+          });
+          req.on("error", () => {
+            res.statusCode = 500;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ error: "Write failed." }));
+          });
+        });
+        server.middlewares.use(async (req, res, next) => {
+          if (!req.url || req.method !== "PATCH") return next();
+          const url = new URL(req.url, "http://localhost");
+          if (url.pathname !== "/codex-local-project-entry") return next();
+
+          const resolved = resolvePathInsideRoot(
+            url.searchParams.get("root") ?? "",
+            url.searchParams.get("path") ?? "",
+          );
+          const nameRaw = url.searchParams.get("name") ?? "";
+          const nextName = normalizeProjectEntryName(nameRaw);
+          if (!resolved || !nextName) {
+            res.statusCode = 400;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ error: "Expected absolute project root, in-project path, and new name." }));
+            return;
+          }
+
+          if (resolved.localPath === resolved.rootPath) {
+            res.statusCode = 400;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ error: "Project root cannot be renamed from this view." }));
+            return;
+          }
+
+          if (nextName !== nameRaw.trim() || nextName === "." || nextName === "..") {
+            res.statusCode = 400;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ error: "New name must be a single path segment." }));
+            return;
+          }
+
+          const parentPath = dirname(resolved.localPath);
+          const targetPath = resolve(join(parentPath, nextName));
+          if (!isPathWithinRoot(resolved.rootPath, targetPath)) {
+            res.statusCode = 400;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ error: "Renamed path must stay inside the project root." }));
+            return;
+          }
+
+          if (existsSync(targetPath)) {
+            res.statusCode = 409;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ error: "A file or folder with that name already exists." }));
+            return;
+          }
+
+          try {
+            await rename(resolved.localPath, targetPath);
+            res.statusCode = 200;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({
+              data: {
+                path: targetPath,
+                name: basename(targetPath),
+              },
+            }));
+          } catch {
+            res.statusCode = 404;
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ error: "Project entry not found." }));
           }
         });
         server.middlewares.use(async (req, res, next) => {

@@ -316,7 +316,7 @@ function onBrowseFiles(): void {
 }
 
 .sdm-link {
-  @apply text-xs text-blue-600 hover:text-blue-700 no-underline hover:underline shrink-0;
+  @apply text-xs text-zinc-700 hover:text-zinc-950 no-underline hover:underline shrink-0;
 }
 
 .sdm-footer {
@@ -336,7 +336,7 @@ function onBrowseFiles(): void {
 }
 
 .sdm-btn-danger {
-  @apply bg-rose-600 text-white hover:bg-rose-700;
+  @apply bg-zinc-900 text-white hover:bg-black;
 }
 
 .sdm-btn-secondary {

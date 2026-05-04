@@ -602,11 +602,11 @@ function readString(value: unknown): string {
 }
 
 .thread-terminal-dot[data-status='attached'] {
-  @apply bg-emerald-400;
+  @apply bg-zinc-300;
 }
 
 .thread-terminal-dot[data-status='error'] {
-  @apply bg-rose-400;
+  @apply bg-zinc-500;
 }
 
 .thread-terminal-title {
@@ -622,7 +622,7 @@ function readString(value: unknown): string {
 }
 
 .thread-terminal-error {
-  @apply m-0 border-b border-rose-900 bg-rose-950 px-3 py-1.5 text-xs text-rose-200;
+  @apply m-0 border-b border-zinc-800 bg-zinc-950 px-3 py-1.5 text-xs text-zinc-300;
 }
 
 .thread-terminal-host {

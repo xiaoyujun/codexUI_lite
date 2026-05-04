@@ -494,8 +494,11 @@
               @toggle-sidebar="setSidebarCollapsed(!isSidebarCollapsed)"
               @start-new-thread="onStartNewThreadFromToolbar"
             />
-            <span v-if="isSkillsRoute" class="skills-route-header-icon" aria-hidden="true">
+            <span v-if="isSkillsRoute" class="content-route-header-icon" aria-hidden="true">
               <IconTablerBolt />
+            </span>
+            <span v-else-if="isProjectFilesRoute" class="content-route-header-icon" aria-hidden="true">
+              <IconTablerFolderOpen />
             </span>
           </template>
           <template #actions>
@@ -545,6 +548,18 @@
               :try-in-flight-key="directoryTryInFlightKey"
               @skills-changed="onSkillsChanged"
               @try-item="onTryDirectoryItem"
+            />
+          </template>
+          <template v-else-if="isProjectFilesRoute">
+            <ProjectFilesView
+              :root-path="projectFilesRootPath"
+              :directory-path="projectFilesDirectoryPath"
+              :file-path="projectFilesFilePath"
+              :project-name="projectFilesProjectName"
+              :recent-files="projectFilesRecentForCurrentRoot"
+              @navigate-directory="onNavigateProjectFilesDirectory"
+              @open-file="onOpenProjectFilesFile"
+              @open-recent-file="onOpenRecentProjectFile"
             />
           </template>
           <template v-else-if="isHomeRoute">
@@ -965,6 +980,7 @@ import IconTablerSearch from './components/icons/IconTablerSearch.vue'
 import IconTablerSettings from './components/icons/IconTablerSettings.vue'
 import IconTablerTerminal from './components/icons/IconTablerTerminal.vue'
 import IconTablerX from './components/icons/IconTablerX.vue'
+import IconTablerFolderOpen from './components/icons/IconTablerFolderOpen.vue'
 import { useDesktopState } from './composables/useDesktopState'
 import { useMobile } from './composables/useMobile'
 import { useUiLanguage } from './composables/useUiLanguage'
@@ -1009,6 +1025,7 @@ const ThreadConversation = defineAsyncComponent(() => import('./components/conte
 const ThreadTerminalPanel = defineAsyncComponent(() => import('./components/content/ThreadTerminalPanel.vue'))
 const ReviewPane = defineAsyncComponent(() => import('./components/content/ReviewPane.vue'))
 const DirectoryHub = defineAsyncComponent(() => import('./components/content/DirectoryHub.vue'))
+const ProjectFilesView = defineAsyncComponent(() => import('./components/content/ProjectFilesView.vue'))
 const { t, uiLanguage, uiLanguageOptions, setUiLanguage } = useUiLanguage()
 
 const SIDEBAR_COLLAPSED_STORAGE_KEY = 'codex-web-local.sidebar-collapsed.v1'
@@ -1051,6 +1068,15 @@ type DirectoryTryItemPayload = {
   skillPath?: string
   prompt?: string
   attachedSkills?: Array<{ name: string; path: string }>
+}
+
+type ProjectFileRecentEntry = {
+  root: string
+  directoryPath: string
+  path: string
+  name: string
+  projectName: string
+  openedAt: number
 }
 
 type ChatWidthPreset = {
@@ -1323,6 +1349,8 @@ const accountActionError = ref('')
 const SEND_WITH_ENTER_KEY = 'codex-web-local.send-with-enter.v1'
 const IN_PROGRESS_SEND_MODE_KEY = 'codex-web-local.in-progress-send-mode.v1'
 const DARK_MODE_KEY = 'codex-web-local.dark-mode.v1'
+const PROJECT_FILES_RECENTS_KEY = 'codex-web-local.project-files-recents.v1'
+const PROJECT_FILES_RECENTS_LIMIT = 12
 const DICTATION_CLICK_TO_TOGGLE_KEY = 'codex-web-local.dictation-click-to-toggle.v1'
 const DICTATION_AUTO_SEND_KEY = 'codex-web-local.dictation-auto-send.v1'
 const DICTATION_LANGUAGE_KEY = 'codex-web-local.dictation-language.v1'
@@ -1332,6 +1360,7 @@ const MOBILE_RESUME_RELOAD_MIN_HIDDEN_MS = 400
 const sendWithEnter = ref(loadBoolPref(SEND_WITH_ENTER_KEY, true))
 const inProgressSendMode = ref<'steer' | 'queue'>(loadInProgressSendModePref())
 const darkMode = ref<'system' | 'light' | 'dark'>(loadDarkModePref())
+const projectFilesRecents = ref<ProjectFileRecentEntry[]>(loadProjectFileRecents())
 const chatWidth = ref<ChatWidthMode>(loadChatWidthPref())
 const dictationClickToToggle = ref(loadBoolPref(DICTATION_CLICK_TO_TOGGLE_KEY, false))
 const dictationAutoSend = ref(loadBoolPref(DICTATION_AUTO_SEND_KEY, true))
@@ -1398,8 +1427,10 @@ const routeThreadId = computed(() => {
 
 const isHomeRoute = computed(() => route.name === 'home')
 const isSkillsRoute = computed(() => route.name === 'skills')
+const isProjectFilesRoute = computed(() => route.name === 'project-files')
 const contentTitle = computed(() => {
   if (isSkillsRoute.value) return t('Skills')
+  if (isProjectFilesRoute.value) return t('Project files')
   if (isHomeRoute.value) return t('Start new thread')
   return selectedThread.value?.title ?? t('Choose a thread')
 })
@@ -1439,6 +1470,22 @@ const composerCwd = computed(() => {
   if (isHomeRoute.value) return newThreadCwd.value.trim()
   return selectedThread.value?.cwd?.trim() ?? ''
 })
+function readRouteQueryString(key: string): string {
+  const value = route.query[key]
+  if (typeof value === 'string') return value.trim()
+  return Array.isArray(value) && typeof value[0] === 'string' ? value[0].trim() : ''
+}
+const projectFilesRootPath = computed(() => readRouteQueryString('root'))
+const projectFilesDirectoryPath = computed(() => readRouteQueryString('path') || projectFilesRootPath.value)
+const projectFilesFilePath = computed(() => readRouteQueryString('file'))
+const projectFilesProjectName = computed(() => readRouteQueryString('name') || getPathLeafName(projectFilesRootPath.value) || t('Project files'))
+const projectFilesRecentForCurrentRoot = computed(() => {
+  const root = normalizePathForUi(projectFilesRootPath.value).trim().toLowerCase()
+  if (!root) return []
+  return projectFilesRecents.value
+    .filter((entry) => normalizePathForUi(entry.root).trim().toLowerCase() === root)
+    .slice(0, 4)
+})
 const canShowTerminalToggle = computed(() => (
   isThreadTerminalAvailable.value && (
     (isHomeRoute.value && composerCwd.value.length > 0) ||
@@ -1463,7 +1510,7 @@ const isTerminalKeyboardLayoutActive = computed(() => (
 ))
 const directoryCwd = computed(() => selectedThread.value?.cwd?.trim() ?? newThreadCwd.value.trim())
 const isSelectedThreadInProgress = computed(() => !isHomeRoute.value && selectedThread.value?.inProgress === true)
-const showThreadContextBadge = computed(() => !isHomeRoute.value && !isSkillsRoute.value && selectedThreadId.value.trim().length > 0)
+const showThreadContextBadge = computed(() => !isHomeRoute.value && !isSkillsRoute.value && !isProjectFilesRoute.value && selectedThreadId.value.trim().length > 0)
 const isAccountSwitchBlocked = computed(() =>
   isSendingMessage.value ||
   isInterruptingTurn.value ||
@@ -2315,15 +2362,26 @@ function onStartNewThread(projectName: string): void {
 
 function onBrowseThreadFiles(threadId: string): void {
   let targetCwd = ''
+  let threadTitle = ''
   for (const group of projectGroups.value) {
     const thread = group.threads.find((row) => row.id === threadId)
     if (thread?.cwd?.trim()) {
       targetCwd = thread.cwd.trim()
+      threadTitle = thread.title.trim()
       break
     }
   }
   if (!targetCwd || typeof window === 'undefined') return
-  window.open(`/codex-local-browse${encodeURI(targetCwd)}`, '_blank', 'noopener,noreferrer')
+  const recentFile = getMostRecentProjectFile(targetCwd)
+  void router.push({
+    name: 'project-files',
+    query: buildProjectFilesQuery(
+      targetCwd,
+      recentFile?.directoryPath || targetCwd,
+      recentFile?.path || '',
+      threadTitle || recentFile?.projectName || getPathLeafName(targetCwd),
+    ),
+  })
 }
 
 function getProjectCwd(projectName: string): string {
@@ -2347,7 +2405,56 @@ function toWorktreeFolderNameDraft(projectName: string): string {
 function onBrowseProjectFiles(projectName: string): void {
   const targetCwd = getProjectCwd(projectName)
   if (!targetCwd || typeof window === 'undefined') return
-  window.open(`/codex-local-browse${encodeURI(targetCwd)}`, '_blank', 'noopener,noreferrer')
+  const recentFile = getMostRecentProjectFile(targetCwd)
+  void router.push({
+    name: 'project-files',
+    query: buildProjectFilesQuery(
+      targetCwd,
+      recentFile?.directoryPath || targetCwd,
+      recentFile?.path || '',
+      getProjectDisplayNameForWorktree(projectName),
+    ),
+  })
+}
+
+function buildProjectFilesQuery(root: string, path: string, file = '', name = ''): Record<string, string> {
+  const query: Record<string, string> = {
+    root,
+    path: path || root,
+  }
+  if (file) query.file = file
+  if (name) query.name = name
+  return query
+}
+
+function onNavigateProjectFilesDirectory(path: string): void {
+  const root = projectFilesRootPath.value
+  if (!root || !path) return
+  void router.push({
+    name: 'project-files',
+    query: buildProjectFilesQuery(root, path, '', projectFilesProjectName.value),
+  })
+}
+
+function onOpenProjectFilesFile(path: string): void {
+  const root = projectFilesRootPath.value
+  if (!root || !path) return
+  rememberProjectFile(root, projectFilesDirectoryPath.value || getPathParent(path) || root, path, projectFilesProjectName.value)
+  void router.push({
+    name: 'project-files',
+    query: buildProjectFilesQuery(root, projectFilesDirectoryPath.value || root, path, projectFilesProjectName.value),
+  })
+}
+
+function onOpenRecentProjectFile(path: string, directoryPath: string): void {
+  const root = projectFilesRootPath.value
+  if (!root || !path) return
+  const nextDirectoryPath = directoryPath || getPathParent(path) || root
+  rememberProjectFile(root, nextDirectoryPath, path, projectFilesProjectName.value)
+  void router.push({
+    name: 'project-files',
+    query: buildProjectFilesQuery(root, nextDirectoryPath, path, projectFilesProjectName.value),
+  })
 }
 
 async function onCreateProjectWorktree(projectName: string): Promise<void> {
@@ -3518,6 +3625,81 @@ function loadDarkModePref(): 'system' | 'light' | 'dark' {
   return 'system'
 }
 
+function normalizeProjectFileRecent(value: unknown): ProjectFileRecentEntry | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null
+  const record = value as Record<string, unknown>
+  const root = typeof record.root === 'string' ? normalizePathForUi(record.root).trim() : ''
+  const path = typeof record.path === 'string' ? normalizePathForUi(record.path).trim() : ''
+  if (!root || !path) return null
+  const directoryPath = typeof record.directoryPath === 'string'
+    ? normalizePathForUi(record.directoryPath).trim()
+    : ''
+  const name = typeof record.name === 'string' ? record.name.trim() : ''
+  const projectName = typeof record.projectName === 'string' ? record.projectName.trim() : ''
+  const openedAt = typeof record.openedAt === 'number' && Number.isFinite(record.openedAt)
+    ? record.openedAt
+    : 0
+  return {
+    root,
+    directoryPath: directoryPath || getPathParent(path) || root,
+    path,
+    name: name || getPathLeafName(path) || 'File',
+    projectName,
+    openedAt,
+  }
+}
+
+function loadProjectFileRecents(): ProjectFileRecentEntry[] {
+  if (typeof window === 'undefined') return []
+  try {
+    const raw = window.localStorage.getItem(PROJECT_FILES_RECENTS_KEY)
+    const parsed = raw ? JSON.parse(raw) as unknown : []
+    if (!Array.isArray(parsed)) return []
+    return parsed
+      .flatMap((entry) => {
+        const normalized = normalizeProjectFileRecent(entry)
+        return normalized ? [normalized] : []
+      })
+      .sort((a, b) => b.openedAt - a.openedAt)
+      .slice(0, PROJECT_FILES_RECENTS_LIMIT)
+  } catch {
+    return []
+  }
+}
+
+function saveProjectFileRecents(entries: ProjectFileRecentEntry[]): void {
+  if (typeof window === 'undefined') return
+  window.localStorage.setItem(PROJECT_FILES_RECENTS_KEY, JSON.stringify(entries.slice(0, PROJECT_FILES_RECENTS_LIMIT)))
+}
+
+function rememberProjectFile(root: string, directoryPath: string, path: string, projectName: string): void {
+  const normalizedRoot = normalizePathForUi(root).trim()
+  const normalizedPath = normalizePathForUi(path).trim()
+  if (!normalizedRoot || !normalizedPath) return
+
+  const normalizedDirectory = normalizePathForUi(directoryPath).trim() || getPathParent(normalizedPath) || normalizedRoot
+  const nextEntry: ProjectFileRecentEntry = {
+    root: normalizedRoot,
+    directoryPath: normalizedDirectory,
+    path: normalizedPath,
+    name: getPathLeafName(normalizedPath) || 'File',
+    projectName: projectName.trim(),
+    openedAt: Date.now(),
+  }
+  const nextEntries = [
+    nextEntry,
+    ...projectFilesRecents.value.filter((entry) => normalizePathForUi(entry.path).trim() !== normalizedPath),
+  ].slice(0, PROJECT_FILES_RECENTS_LIMIT)
+  projectFilesRecents.value = nextEntries
+  saveProjectFileRecents(nextEntries)
+}
+
+function getMostRecentProjectFile(root: string): ProjectFileRecentEntry | null {
+  const normalizedRoot = normalizePathForUi(root).trim().toLowerCase()
+  if (!normalizedRoot) return null
+  return projectFilesRecents.value.find((entry) => normalizePathForUi(entry.root).trim().toLowerCase() === normalizedRoot) ?? null
+}
+
 function loadInProgressSendModePref(): 'steer' | 'queue' {
   if (typeof window === 'undefined') return 'steer'
   const v = window.localStorage.getItem(IN_PROGRESS_SEND_MODE_KEY)
@@ -3873,7 +4055,7 @@ async function syncThreadSelectionWithRoute(): Promise<void> {
     do {
       hasPendingRouteSync = false
 
-      if (route.name === 'home' || route.name === 'skills') {
+      if (route.name === 'home' || route.name === 'skills' || route.name === 'project-files') {
         if (selectedThreadId.value !== '') {
           await selectThread('')
         }
@@ -3920,6 +4102,20 @@ watch(
 )
 
 watch(
+  () => [
+    route.name,
+    projectFilesRootPath.value,
+    projectFilesDirectoryPath.value,
+    projectFilesFilePath.value,
+    projectFilesProjectName.value,
+  ] as const,
+  ([routeName, root, directoryPath, filePath, projectName]) => {
+    if (routeName !== 'project-files' || !root || !filePath) return
+    rememberProjectFile(root, directoryPath || getPathParent(filePath) || root, filePath, projectName)
+  },
+)
+
+watch(
   () => composerCwd.value,
   () => {
     void refreshTerminalQuickCommands()
@@ -3931,7 +4127,7 @@ watch(
   async (threadId) => {
     if (!hasInitialized.value) return
     if (isRouteSyncInProgress.value) return
-    if (isHomeRoute.value || isSkillsRoute.value) return
+    if (isHomeRoute.value || isSkillsRoute.value || isProjectFilesRoute.value) return
 
     if (!threadId) {
       if (route.name !== 'home') {
@@ -4254,15 +4450,15 @@ async function loadWorktreeBranches(sourceCwd: string): Promise<void> {
 }
 
 .sidebar-skills-link {
-  @apply mx-2 flex items-center gap-3 rounded-2xl border border-transparent bg-transparent px-3 py-2.5 text-left text-zinc-700 transition hover:bg-zinc-100 hover:text-zinc-950 cursor-pointer;
+  @apply mx-2 flex items-center gap-3 rounded-xl border border-transparent bg-transparent px-3 py-2.5 text-left text-zinc-700 transition hover:bg-zinc-100 hover:text-zinc-950 cursor-pointer;
 }
 
 .sidebar-skills-link.is-active {
-  @apply border-transparent bg-zinc-100 text-zinc-950;
+  @apply border-zinc-200 bg-white text-zinc-950 shadow-sm;
 }
 
 .sidebar-skills-link-icon {
-  @apply flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-emerald-600 text-white;
+  @apply flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-zinc-950 text-white;
 }
 
 .sidebar-skills-link-icon :deep(svg) {
@@ -4285,11 +4481,11 @@ async function loadWorktreeBranches(sourceCwd: string): Promise<void> {
   @apply ml-1;
 }
 
-.skills-route-header-icon {
-  @apply flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-emerald-600 text-white shadow-[0_16px_32px_-20px_rgba(5,150,105,0.9)];
+.content-route-header-icon {
+  @apply flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-zinc-950 text-white shadow-sm;
 }
 
-.skills-route-header-icon :deep(svg) {
+.content-route-header-icon :deep(svg) {
   @apply h-4.5 w-4.5;
 }
 
@@ -4333,7 +4529,7 @@ async function loadWorktreeBranches(sourceCwd: string): Promise<void> {
 
 
 .content-error {
-  @apply m-0 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700;
+  @apply m-0 rounded-lg border border-zinc-300 bg-zinc-50 px-3 py-2 text-sm text-zinc-700;
 }
 
 .content-grid {
@@ -4454,7 +4650,7 @@ async function loadWorktreeBranches(sourceCwd: string): Promise<void> {
 }
 
 .new-thread-launch-card {
-  @apply mt-4 w-full max-w-3xl rounded-[28px] border border-emerald-200 bg-[radial-gradient(circle_at_top_left,_rgba(16,185,129,0.2),_transparent_42%),linear-gradient(135deg,_#f4fff8,_#ffffff_58%)] px-5 py-5 text-left shadow-[0_18px_50px_-28px_rgba(5,150,105,0.45)];
+  @apply mt-4 w-full max-w-3xl rounded-2xl border border-zinc-200 bg-white px-5 py-5 text-left shadow-sm;
 }
 
 .new-thread-launch-card-copy {
@@ -4466,7 +4662,7 @@ async function loadWorktreeBranches(sourceCwd: string): Promise<void> {
 }
 
 .new-thread-launch-card-badge {
-  @apply flex h-8 w-8 shrink-0 items-center justify-center rounded-2xl bg-emerald-700 text-white shadow-[0_12px_28px_-18px_rgba(5,150,105,0.9)];
+  @apply flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-zinc-950 text-white shadow-sm;
 }
 
 .new-thread-launch-card-badge :deep(svg) {
@@ -4474,7 +4670,7 @@ async function loadWorktreeBranches(sourceCwd: string): Promise<void> {
 }
 
 .new-thread-launch-card-eyebrow {
-  @apply m-0 text-[11px] font-semibold uppercase tracking-[0.24em] text-emerald-700;
+  @apply m-0 text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-500;
 }
 
 .new-thread-launch-card-title {
@@ -4494,7 +4690,7 @@ async function loadWorktreeBranches(sourceCwd: string): Promise<void> {
 }
 
 .new-thread-launch-card-pill {
-  @apply inline-flex items-center rounded-full border border-emerald-100 bg-white/80 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-emerald-700;
+  @apply inline-flex items-center rounded-md border border-zinc-200 bg-zinc-50 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-zinc-600;
 }
 
 .new-thread-launch-card-button {
@@ -4502,19 +4698,19 @@ async function loadWorktreeBranches(sourceCwd: string): Promise<void> {
 }
 
 .new-thread-launch-card-button-primary {
-  @apply border-emerald-700 bg-emerald-700 text-white hover:bg-emerald-600;
+  @apply border-zinc-950 bg-zinc-950 text-white hover:bg-black;
 }
 
 :global(:root.dark) .new-thread-launch-card {
-  @apply border-emerald-900/80 bg-[radial-gradient(circle_at_top_left,_rgba(16,185,129,0.2),_transparent_38%),linear-gradient(135deg,_rgba(6,78,59,0.32),_rgba(24,24,27,0.96)_58%)] shadow-[0_24px_64px_-34px_rgba(16,185,129,0.35)];
+  @apply border-zinc-800 bg-zinc-900 shadow-none;
 }
 
 :global(:root.dark) .new-thread-launch-card-eyebrow {
-  @apply text-emerald-300;
+  @apply text-zinc-500;
 }
 
 :global(:root.dark) .new-thread-launch-card-badge {
-  @apply bg-emerald-500 text-white;
+  @apply bg-zinc-100 text-zinc-950;
 }
 
 :global(:root.dark) .new-thread-launch-card-title {
@@ -4526,7 +4722,7 @@ async function loadWorktreeBranches(sourceCwd: string): Promise<void> {
 }
 
 :global(:root.dark) .new-thread-launch-card-pill {
-  @apply border-emerald-900 bg-zinc-900/70 text-emerald-300;
+  @apply border-zinc-700 bg-zinc-950 text-zinc-300;
 }
 
 :global(:root.dark) .new-thread-launch-card-button {
@@ -4534,7 +4730,7 @@ async function loadWorktreeBranches(sourceCwd: string): Promise<void> {
 }
 
 :global(:root.dark) .new-thread-launch-card-button-primary {
-  @apply border-emerald-600 bg-emerald-600 text-white hover:bg-emerald-500;
+  @apply border-zinc-100 bg-zinc-100 text-zinc-950 hover:bg-white;
 }
 
 .new-thread-folder-action {
@@ -4644,7 +4840,7 @@ async function loadWorktreeBranches(sourceCwd: string): Promise<void> {
 }
 
 .new-thread-open-folder-error {
-  @apply m-0 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700;
+  @apply m-0 rounded-xl border border-zinc-300 bg-zinc-50 px-3 py-2 text-sm text-zinc-700;
 }
 
 .new-thread-open-folder-error-actions {
@@ -4731,7 +4927,7 @@ async function loadWorktreeBranches(sourceCwd: string): Promise<void> {
 }
 
 .worktree-init-status.is-error {
-  @apply border-rose-300 bg-rose-50 text-rose-800;
+  @apply border-zinc-300 bg-zinc-50 text-zinc-800;
 }
 
 .worktree-init-status-title {
@@ -4743,7 +4939,7 @@ async function loadWorktreeBranches(sourceCwd: string): Promise<void> {
 }
 
 .sidebar-settings-area {
-  @apply shrink-0 bg-slate-100 pt-2 px-2 pb-2 border-t border-zinc-200;
+  @apply shrink-0 bg-zinc-50 pt-2 px-2 pb-2 border-t border-zinc-200;
 }
 
 .sidebar-settings-button {
@@ -4816,7 +5012,7 @@ async function loadWorktreeBranches(sourceCwd: string): Promise<void> {
 }
 
 .sidebar-settings-telegram-error {
-  @apply mt-2 rounded-md bg-rose-50 px-2.5 py-2 text-xs text-rose-700;
+  @apply mt-2 rounded-md bg-zinc-100 px-2.5 py-2 text-xs text-zinc-700;
 }
 
 .sidebar-settings-telegram-actions {
@@ -4856,7 +5052,7 @@ async function loadWorktreeBranches(sourceCwd: string): Promise<void> {
 }
 
 .sidebar-settings-account-error {
-  @apply mb-2 rounded-md bg-rose-50 px-2 py-1.5 text-xs text-rose-700;
+  @apply mb-2 rounded-md bg-zinc-100 px-2 py-1.5 text-xs text-zinc-700;
 }
 
 .sidebar-settings-account-refresh {
@@ -4872,7 +5068,7 @@ async function loadWorktreeBranches(sourceCwd: string): Promise<void> {
 }
 
 .sidebar-settings-account-login-link {
-  @apply min-w-0 truncate text-xs text-blue-600 hover:text-blue-700 hover:underline;
+  @apply min-w-0 truncate text-xs font-medium text-zinc-700 hover:text-zinc-950 hover:underline;
 }
 
 .sidebar-settings-account-empty {
@@ -4904,7 +5100,7 @@ async function loadWorktreeBranches(sourceCwd: string): Promise<void> {
 }
 
 .codex-login-modal-link {
-  @apply min-w-0 truncate text-sm text-blue-600 hover:text-blue-700 hover:underline;
+  @apply min-w-0 truncate text-sm font-medium text-zinc-700 hover:text-zinc-950 hover:underline;
 }
 
 .codex-login-modal-input {
@@ -4912,7 +5108,7 @@ async function loadWorktreeBranches(sourceCwd: string): Promise<void> {
 }
 
 .codex-login-modal-error {
-  @apply rounded-md bg-rose-50 px-3 py-2 text-xs text-rose-700;
+  @apply rounded-md bg-zinc-100 px-3 py-2 text-xs text-zinc-700;
 }
 
 .codex-login-modal-actions {
@@ -4946,7 +5142,7 @@ async function loadWorktreeBranches(sourceCwd: string): Promise<void> {
 }
 
 :global(:root.dark) .codex-login-modal-link {
-  @apply text-sky-300 hover:text-sky-200;
+  @apply text-zinc-300 hover:text-zinc-100;
 }
 
 :global(:root.dark) .codex-login-modal-input {
@@ -4954,7 +5150,7 @@ async function loadWorktreeBranches(sourceCwd: string): Promise<void> {
 }
 
 :global(:root.dark) .codex-login-modal-error {
-  @apply bg-rose-950/40 text-rose-200;
+  @apply bg-zinc-800 text-zinc-300;
 }
 
 :global(:root.dark) .codex-login-modal-submit {
@@ -4970,11 +5166,11 @@ async function loadWorktreeBranches(sourceCwd: string): Promise<void> {
 }
 
 .sidebar-settings-account-item.is-active {
-  @apply border-emerald-200 bg-emerald-50;
+  @apply border-zinc-400 bg-zinc-100;
 }
 
 .sidebar-settings-account-item.is-unavailable {
-  @apply border-rose-200 bg-rose-50;
+  @apply border-zinc-300 bg-zinc-50 opacity-70;
 }
 
 .sidebar-settings-account-main {
@@ -5002,11 +5198,11 @@ async function loadWorktreeBranches(sourceCwd: string): Promise<void> {
 }
 
 .sidebar-settings-account-item.is-active .sidebar-settings-account-id {
-  @apply bg-emerald-100 text-emerald-800;
+  @apply bg-zinc-900 text-white;
 }
 
 .sidebar-settings-account-item.is-unavailable .sidebar-settings-account-id {
-  @apply bg-rose-100 text-rose-800;
+  @apply bg-zinc-200 text-zinc-700;
 }
 
 .sidebar-settings-account-switch {
@@ -5014,7 +5210,7 @@ async function loadWorktreeBranches(sourceCwd: string): Promise<void> {
 }
 
 .sidebar-settings-account-remove {
-  @apply invisible shrink-0 rounded-full border border-amber-200 bg-white px-2 py-0.5 text-[10px] leading-4 text-zinc-500 opacity-0 pointer-events-none transition-colors hover:bg-amber-50 disabled:cursor-default disabled:opacity-60;
+  @apply invisible shrink-0 rounded-full border border-zinc-200 bg-white px-2 py-0.5 text-[10px] leading-4 text-zinc-500 opacity-0 pointer-events-none transition-colors hover:bg-zinc-100 disabled:cursor-default disabled:opacity-60;
 }
 
 .sidebar-settings-account-remove.is-visible {
@@ -5022,7 +5218,7 @@ async function loadWorktreeBranches(sourceCwd: string): Promise<void> {
 }
 
 .sidebar-settings-account-remove.is-confirming {
-  @apply border-amber-300 bg-amber-50 text-amber-700 font-medium;
+  @apply border-zinc-900 bg-zinc-900 text-white font-medium;
 }
 
 .sidebar-settings-label {
@@ -5056,7 +5252,7 @@ async function loadWorktreeBranches(sourceCwd: string): Promise<void> {
 }
 
 .sidebar-settings-error {
-  @apply text-xs text-red-600 bg-red-50 rounded px-2 py-1.5 break-words;
+  @apply text-xs text-zinc-700 bg-zinc-100 rounded px-2 py-1.5 break-words;
 }
 
 .sidebar-settings-key-group {
@@ -5108,7 +5304,7 @@ async function loadWorktreeBranches(sourceCwd: string): Promise<void> {
 }
 
 .sidebar-settings-provider-link {
-  @apply text-xs text-blue-600 hover:text-blue-700 underline shrink-0;
+  @apply text-xs text-zinc-700 hover:text-zinc-950 underline shrink-0;
 }
 
 :root.dark .sidebar-settings-provider-select {
@@ -5132,7 +5328,7 @@ async function loadWorktreeBranches(sourceCwd: string): Promise<void> {
 }
 
 :root.dark .sidebar-settings-provider-link {
-  @apply text-blue-400 hover:text-blue-300;
+  @apply text-zinc-300 hover:text-zinc-100;
 }
 
 :root.dark .sidebar-settings-key-input {
@@ -5175,15 +5371,15 @@ async function loadWorktreeBranches(sourceCwd: string): Promise<void> {
 }
 
 .sidebar-settings-context-value[data-state='ok'] {
-  @apply text-emerald-700;
+  @apply text-zinc-800;
 }
 
 .sidebar-settings-context-value[data-state='warning'] {
-  @apply text-amber-700;
+  @apply text-zinc-700;
 }
 
 .sidebar-settings-context-value[data-state='danger'] {
-  @apply text-rose-700;
+  @apply text-zinc-950;
 }
 
 .sidebar-settings-context-meta {

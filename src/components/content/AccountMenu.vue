@@ -130,7 +130,7 @@ onBeforeUnmount(() => {
 }
 
 .account-menu-error {
-  @apply rounded-xl bg-rose-50 px-3 py-2 text-xs text-rose-700;
+  @apply rounded-xl bg-zinc-100 px-3 py-2 text-xs text-zinc-700;
 }
 
 .account-menu-empty {
@@ -146,7 +146,7 @@ onBeforeUnmount(() => {
 }
 
 .account-menu-item.is-active {
-  @apply border-emerald-200 bg-emerald-50;
+  @apply border-zinc-400 bg-zinc-100;
 }
 
 .account-menu-item-main {

@@ -66,15 +66,15 @@
 }
 
 :root.dark .sidebar-settings-context-value[data-state='ok'] {
-  @apply text-emerald-300;
+  @apply text-zinc-200;
 }
 
 :root.dark .sidebar-settings-context-value[data-state='warning'] {
-  @apply text-amber-300;
+  @apply text-zinc-300;
 }
 
 :root.dark .sidebar-settings-context-value[data-state='danger'] {
-  @apply text-rose-300;
+  @apply text-zinc-100;
 }
 
 :root.dark .sidebar-settings-context-meta {
@@ -98,7 +98,7 @@
 }
 
 :root.dark .sidebar-settings-account-error {
-  @apply bg-rose-950/40 text-rose-200;
+  @apply bg-zinc-800 text-zinc-300;
 }
 
 :root.dark .sidebar-settings-account-refresh,
@@ -108,7 +108,7 @@
 }
 
 :root.dark .sidebar-settings-account-login-link {
-  @apply text-sky-300 hover:text-sky-200;
+  @apply text-zinc-300 hover:text-zinc-100;
 }
 
 :root.dark .sidebar-settings-account-empty {
@@ -120,11 +120,11 @@
 }
 
 :root.dark .sidebar-settings-account-item.is-active {
-  @apply border-emerald-500/35 bg-emerald-500/10;
+  @apply border-zinc-500 bg-zinc-800;
 }
 
 :root.dark .sidebar-settings-account-item.is-unavailable {
-  @apply border-rose-500/35 bg-rose-500/10;
+  @apply border-zinc-700 bg-zinc-900 opacity-70;
 }
 
 :root.dark .sidebar-settings-account-email {
@@ -144,19 +144,19 @@
 }
 
 :root.dark .sidebar-settings-account-item.is-active .sidebar-settings-account-id {
-  @apply bg-emerald-500/15 text-emerald-200;
+  @apply bg-zinc-200 text-zinc-900;
 }
 
 :root.dark .sidebar-settings-account-item.is-unavailable .sidebar-settings-account-id {
-  @apply bg-rose-500/15 text-rose-200;
+  @apply bg-zinc-800 text-zinc-400;
 }
 
 :root.dark .sidebar-settings-account-remove {
-  @apply border-amber-500/35 bg-zinc-700 text-zinc-400 hover:bg-amber-500/10;
+  @apply border-zinc-600 bg-zinc-700 text-zinc-400 hover:bg-zinc-600;
 }
 
 :root.dark .sidebar-settings-account-remove.is-confirming {
-  @apply border-amber-400/50 bg-amber-500/10 text-amber-200;
+  @apply border-zinc-100 bg-zinc-100 text-zinc-950;
 }
 
 :root.dark .sidebar-settings-value {
@@ -176,11 +176,11 @@
 }
 
 :root.dark .sidebar-skills-link {
-  @apply border-emerald-900/70 bg-[linear-gradient(135deg,_rgba(6,78,59,0.42),_rgba(24,24,27,0.96))] text-zinc-100 hover:border-emerald-700 hover:bg-emerald-950;
+  @apply border-transparent bg-transparent text-zinc-100 hover:border-zinc-700 hover:bg-zinc-800;
 }
 
 :root.dark .sidebar-skills-link.is-active {
-  @apply border-emerald-700 bg-emerald-950/80 text-zinc-50;
+  @apply border-zinc-700 bg-zinc-800 text-zinc-50;
 }
 
 :root.dark .sidebar-search-toggle {
@@ -338,7 +338,7 @@
 }
 
 :root.dark .rate-limit-card-metric {
-  @apply bg-amber-900/40 text-amber-200;
+  @apply bg-zinc-800 text-zinc-300;
 }
 
 :root.dark .rate-limit-card-footer {
@@ -394,7 +394,7 @@
 }
 
 :root.dark .thread-composer-attach-switch.is-on {
-  @apply bg-emerald-500;
+  @apply bg-zinc-200;
 }
 
 :root.dark .thread-composer-file-mentions {
@@ -442,7 +442,7 @@
 }
 
 :root.dark .thread-menu-item-danger {
-  @apply text-rose-300 hover:bg-rose-900/40;
+  @apply text-zinc-300 hover:bg-zinc-700;
 }
 
 :root.dark .thread-menu-trigger {
@@ -474,7 +474,7 @@
 }
 
 :root.dark .rename-thread-button-danger {
-  @apply bg-rose-500 text-white hover:bg-rose-400;
+  @apply bg-zinc-200 text-zinc-900 hover:bg-white;
 }
 
 :root.dark .thread-delete-button {
@@ -482,7 +482,7 @@
 }
 
 :root.dark .thread-delete-button[data-confirming='true'] {
-  @apply bg-rose-500 text-white hover:bg-rose-400;
+  @apply bg-zinc-200 text-zinc-900 hover:bg-white;
 }
 
 :root.dark .message-bubble {
@@ -546,11 +546,11 @@
 }
 
 :root.dark .message-copy-button[data-copied='true'] {
-  @apply border-emerald-500/40 bg-emerald-500/10 text-emerald-200;
+  @apply border-zinc-500 bg-zinc-700 text-zinc-100;
 }
 
 :root.dark .message-rollback-button {
-  @apply text-amber-400/70 hover:text-amber-300;
+  @apply text-zinc-400 hover:text-zinc-200;
 }
 
 :root.dark .message-inline-code {
@@ -624,15 +624,15 @@
 }
 
 :root.dark .cmd-status-running .cmd-status {
-  @apply text-amber-300;
+  @apply text-zinc-400;
 }
 
 :root.dark .cmd-status-ok .cmd-status {
-  @apply text-emerald-300;
+  @apply text-zinc-300;
 }
 
 :root.dark .cmd-status-error .cmd-status {
-  @apply text-rose-300;
+  @apply text-zinc-100;
 }
 
 :root.dark .cmd-output-wrap.cmd-output-visible {
@@ -644,7 +644,7 @@
 }
 
 :root.dark .file-change-path-button {
-  @apply text-sky-300 hover:text-sky-200;
+  @apply text-zinc-200 hover:text-white;
 }
 
 :root.dark .file-change-summary-status {
@@ -660,19 +660,19 @@
 }
 
 :root.dark .file-change-badge[data-operation='add'] {
-  @apply bg-emerald-950/70 text-emerald-300;
+  @apply bg-zinc-800 text-zinc-200;
 }
 
 :root.dark .file-change-badge[data-operation='update'] {
-  @apply bg-sky-950/70 text-sky-300;
+  @apply bg-zinc-800 text-zinc-200;
 }
 
 :root.dark .file-change-badge[data-operation='delete'] {
-  @apply bg-rose-950/70 text-rose-300;
+  @apply bg-zinc-700 text-zinc-100;
 }
 
 :root.dark .file-change-badge[data-operation='move'] {
-  @apply bg-amber-950/70 text-amber-300;
+  @apply bg-zinc-800 text-zinc-200;
 }
 
 :root.dark .file-change-arrow {
@@ -684,11 +684,11 @@
 }
 
 :root.dark .file-change-signed-count[data-tone='add'] {
-  @apply text-emerald-300;
+  @apply text-zinc-300;
 }
 
 :root.dark .file-change-signed-count[data-tone='remove'] {
-  @apply text-rose-300;
+  @apply text-zinc-100;
 }
 
 :root.dark .diff-viewer-shell {
@@ -716,7 +716,7 @@
 }
 
 :root.dark .diff-viewer-file-button[data-active='true'] {
-  @apply border-sky-800 bg-zinc-900;
+  @apply border-zinc-500 bg-zinc-900;
 }
 
 :root.dark .diff-viewer-file-label {
@@ -858,12 +858,12 @@
 }
 
 :root.dark .header-git-status {
-  @apply bg-amber-950/40 text-amber-300;
+  @apply bg-zinc-800 text-zinc-300;
 }
 
 :root.dark .header-git-status.is-error,
 :root.dark .header-git-commits-empty.is-error {
-  @apply bg-red-950/40 text-red-300;
+  @apply bg-zinc-800 text-zinc-200;
 }
 
 :root.dark .review-pane {
@@ -943,7 +943,7 @@
 }
 
 :root.dark .review-pane-segmented-button[data-active='true'] {
-  @apply border-sky-400/40 bg-sky-500 text-white;
+  @apply border-zinc-100 bg-zinc-100 text-zinc-950;
 }
 
 :root.dark .review-pane-segmented-button[data-active='true']::before {
@@ -952,11 +952,11 @@
 
 :root.dark .review-pane-run,
 :root.dark .review-pane-primary-cta {
-  @apply border-emerald-500 bg-emerald-500 text-white hover:bg-emerald-400;
+  @apply border-zinc-100 bg-zinc-100 text-zinc-950 hover:bg-white;
 }
 
 :root.dark .review-pane-refresh {
-  @apply border-amber-500/35 bg-amber-500/12 text-amber-200 hover:bg-amber-500/20;
+  @apply border-zinc-600 bg-zinc-800 text-zinc-200 hover:bg-zinc-700;
 }
 
 :root.dark .review-pane-meta span,
@@ -965,11 +965,11 @@
 }
 
 :root.dark .review-pane-summary-pill.review-pane-summary-pill-add {
-  @apply bg-emerald-500/15 text-emerald-300;
+  @apply bg-zinc-800 text-zinc-300;
 }
 
 :root.dark .review-pane-summary-pill.review-pane-summary-pill-remove {
-  @apply bg-rose-500/15 text-rose-300;
+  @apply bg-zinc-800 text-zinc-300;
 }
 
 :root.dark .review-pane-file-list {
@@ -997,7 +997,7 @@
 }
 
 :root.dark .review-pane-resizer:hover::before {
-  @apply bg-sky-400;
+  @apply bg-zinc-400;
 }
 
 :root.dark .review-pane-file {
@@ -1013,19 +1013,19 @@
 }
 
 :root.dark .review-pane-file-op[data-operation='update'] {
-  @apply bg-amber-500/15 text-amber-200;
+  @apply bg-zinc-800 text-zinc-300;
 }
 
 :root.dark .review-pane-file-op[data-operation='add'] {
-  @apply bg-emerald-500/15 text-emerald-200;
+  @apply bg-zinc-800 text-zinc-300;
 }
 
 :root.dark .review-pane-file-op[data-operation='delete'] {
-  @apply bg-rose-500/15 text-rose-200;
+  @apply bg-zinc-700 text-zinc-100;
 }
 
 :root.dark .review-pane-file-op[data-operation='rename'] {
-  @apply bg-sky-500/15 text-sky-200;
+  @apply bg-zinc-800 text-zinc-300;
 }
 
 :root.dark .review-pane-file-delta,
@@ -1034,11 +1034,11 @@
 }
 
 :root.dark .review-pane-delta-add {
-  @apply text-emerald-300;
+  @apply text-zinc-300;
 }
 
 :root.dark .review-pane-delta-remove {
-  @apply text-rose-300;
+  @apply text-zinc-100;
 }
 
 :root.dark .review-pane-delta-separator {
@@ -1069,12 +1069,12 @@
 
 :root.dark .review-pane-line[data-kind='add'] .review-pane-line-marker,
 :root.dark .review-pane-line[data-kind='add'] .review-pane-line-code {
-  @apply text-emerald-300;
+  @apply text-zinc-100;
 }
 
 :root.dark .review-pane-line[data-kind='remove'] .review-pane-line-marker,
 :root.dark .review-pane-line[data-kind='remove'] .review-pane-line-code {
-  @apply text-rose-300;
+  @apply text-zinc-300;
 }
 
 :root.dark .review-pane-sheet-handle {
@@ -1094,43 +1094,43 @@
 }
 
 :root.dark .request-card {
-  @apply border-amber-700 bg-amber-900/30;
+  @apply border-zinc-700 bg-zinc-900;
 }
 
 :root.dark .request-title {
-  @apply text-amber-200;
+  @apply text-zinc-100;
 }
 
 :root.dark .request-meta {
-  @apply text-amber-400;
+  @apply text-zinc-400;
 }
 
 :root.dark .request-reason {
-  @apply text-amber-200;
+  @apply text-zinc-200;
 }
 
 :root.dark .request-button {
-  @apply border-amber-700 bg-zinc-800 text-amber-200 hover:bg-zinc-700;
+  @apply border-zinc-600 bg-zinc-800 text-zinc-200 hover:bg-zinc-700;
 }
 
 :root.dark .request-button-primary {
-  @apply border-amber-600 bg-amber-600 text-white hover:bg-amber-700;
+  @apply border-zinc-100 bg-zinc-100 text-zinc-950 hover:bg-white;
 }
 
 :root.dark .request-question-option-description {
-  @apply text-amber-400;
+  @apply text-zinc-400;
 }
 
 :root.dark .plan-card {
-  @apply border-sky-700/70 bg-slate-900/78;
+  @apply border-zinc-700 bg-zinc-900;
 }
 
 :root.dark .plan-card-title {
-  @apply text-sky-200;
+  @apply text-zinc-100;
 }
 
 :root.dark .plan-card-badge {
-  @apply bg-sky-800 text-sky-100;
+  @apply bg-zinc-800 text-zinc-200;
 }
 
 :root.dark .plan-card-explanation {
@@ -1157,7 +1157,7 @@
 }
 
 :root.dark .plan-card-markdown .message-file-link {
-  @apply text-sky-300 decoration-sky-500;
+  @apply text-zinc-100 decoration-zinc-500;
 }
 
 :root.dark .plan-card-markdown .message-table {
@@ -1169,11 +1169,11 @@
 }
 
 :root.dark .plan-step-item[data-status='completed'] {
-  @apply border-emerald-900 bg-emerald-950/40;
+  @apply border-zinc-600 bg-zinc-800;
 }
 
 :root.dark .plan-step-item[data-status='inProgress'] {
-  @apply border-amber-900 bg-amber-950/40;
+  @apply border-zinc-500 bg-zinc-800;
 }
 
 :root.dark .plan-step-status {
@@ -1181,11 +1181,11 @@
 }
 
 :root.dark .plan-step-status[data-status='completed'] {
-  @apply bg-emerald-900 text-emerald-200;
+  @apply bg-zinc-100 text-zinc-900;
 }
 
 :root.dark .plan-step-status[data-status='inProgress'] {
-  @apply bg-amber-900 text-amber-200;
+  @apply bg-zinc-200 text-zinc-900;
 }
 
 :root.dark .plan-card-implement-button {
@@ -1197,7 +1197,7 @@
 }
 
 :root.dark .message-file-link {
-  @apply text-blue-400 hover:text-blue-300;
+  @apply text-zinc-100 hover:text-white;
 }
 
 :root.dark .composer-dropdown-search-input {
@@ -1269,7 +1269,7 @@
 }
 
 :root.dark .thread-composer-skill-chip {
-  @apply border-emerald-800 bg-emerald-900/40 text-emerald-300;
+  @apply border-zinc-700 bg-zinc-800 text-zinc-300;
 }
 
 :root.dark .thread-composer-input::placeholder {
@@ -1321,7 +1321,7 @@
 }
 
 :root.dark .worktree-init-status.is-error {
-  @apply border-rose-700 bg-rose-950/40 text-rose-200;
+  @apply border-zinc-700 bg-zinc-800 text-zinc-300;
 }
 
 :root.dark .skills-hub-title {
@@ -1375,7 +1375,7 @@
 }
 
 :root.dark .skills-sync-device a {
-  @apply text-blue-400 hover:text-blue-300;
+  @apply text-zinc-300 hover:text-zinc-100;
 }
 
 :root.dark .skills-sync-device code {
@@ -1383,7 +1383,7 @@
 }
 
 :root.dark .skills-sync-error {
-  @apply border-rose-800 bg-rose-950/40 text-rose-200;
+  @apply border-zinc-700 bg-zinc-900 text-zinc-300;
 }
 
 :root.dark .skills-search-panel {
@@ -1416,7 +1416,7 @@
 }
 
 :root.dark .skills-hub-error {
-  @apply border-rose-800 bg-rose-950/40 text-rose-200;
+  @apply border-zinc-700 bg-zinc-900 text-zinc-300;
 }
 
 :root.dark .directory-title,

@@ -1627,7 +1627,7 @@ onMounted(async () => {
 }
 
 .directory-action.danger {
-  @apply border-rose-600 bg-rose-600 text-white hover:bg-rose-700;
+  @apply border-zinc-900 bg-zinc-900 text-white hover:bg-black;
 }
 
 .directory-tabs {
@@ -1723,11 +1723,11 @@ onMounted(async () => {
 }
 
 .mcp-skill-badge-ok {
-  @apply border-emerald-200 bg-emerald-50 text-emerald-700;
+  @apply border-zinc-300 bg-zinc-100 text-zinc-700;
 }
 
 .mcp-skill-badge-warning {
-  @apply border-amber-200 bg-amber-50 text-amber-700;
+  @apply border-zinc-300 bg-zinc-50 text-zinc-700;
 }
 
 .mcp-skill-badge-muted {
@@ -1812,7 +1812,7 @@ button.directory-card {
 }
 
 .directory-badge {
-  @apply shrink-0 rounded-md border border-emerald-200 bg-emerald-50 px-1.5 py-0.5 text-[10px] font-medium leading-none text-emerald-700;
+  @apply shrink-0 rounded-md border border-zinc-300 bg-zinc-100 px-1.5 py-0.5 text-[10px] font-medium leading-none text-zinc-700;
 }
 
 .directory-badge.is-muted {
@@ -1847,15 +1847,15 @@ button.directory-card {
 
 .directory-error,
 .directory-toast.is-error {
-  @apply border-rose-200 bg-rose-50 text-rose-700;
+  @apply border-zinc-300 bg-zinc-50 text-zinc-700;
 }
 
 .directory-auth-status.is-error {
-  @apply border-rose-200 bg-rose-50 text-rose-700;
+  @apply border-zinc-300 bg-zinc-50 text-zinc-700;
 }
 
 .directory-toast {
-  @apply mx-auto w-full max-w-5xl rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-700;
+  @apply mx-auto w-full max-w-5xl rounded-lg border border-zinc-300 bg-zinc-100 px-3 py-2 text-sm font-medium text-zinc-800;
 }
 
 .directory-card-toggle {
@@ -1926,11 +1926,11 @@ button.directory-card {
 }
 
 .directory-auth-status.is-ok {
-  @apply border-emerald-200 bg-emerald-50 text-emerald-700;
+  @apply border-zinc-300 bg-zinc-100 text-zinc-700;
 }
 
 .directory-auth-status.is-warning {
-  @apply border-amber-200 bg-amber-50 text-amber-700;
+  @apply border-zinc-300 bg-zinc-50 text-zinc-700;
 }
 
 .directory-auth-status.is-muted {
@@ -1938,7 +1938,7 @@ button.directory-card {
 }
 
 .directory-include-row button {
-  @apply border-0 bg-transparent p-0 text-xs font-medium text-blue-600 hover:underline;
+  @apply border-0 bg-transparent p-0 text-xs font-medium text-zinc-700 hover:text-zinc-950 hover:underline;
 }
 
 .directory-screenshots {
@@ -1954,7 +1954,7 @@ button.directory-card {
 }
 
 .composio-fallback {
-  @apply bg-sky-100 text-sky-700;
+  @apply bg-zinc-100 text-zinc-700;
 }
 
 :global(:root.dark) .directory-title,
@@ -2088,10 +2088,10 @@ button.directory-card {
 :global(:root.dark) .directory-auth-status.is-error,
 :global(:root.dark) .directory-error,
 :global(:root.dark) .directory-toast.is-error {
-  @apply border-rose-900/60 bg-rose-950/60 text-rose-300;
+  @apply border-zinc-700 bg-zinc-900 text-zinc-300;
 }
 
 :global(:root.dark) .composio-fallback {
-  @apply bg-sky-950 text-sky-300;
+  @apply bg-zinc-800 text-zinc-300;
 }
 </style>

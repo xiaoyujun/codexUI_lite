@@ -1,12 +1,12 @@
 import { fileURLToPath } from 'node:url'
-import { dirname, extname, isAbsolute, join } from 'node:path'
+import { basename, dirname, extname, isAbsolute, join, relative, resolve } from 'node:path'
 import type { Server as HttpServer, IncomingMessage } from 'node:http'
 import { existsSync } from 'node:fs'
-import { writeFile, stat } from 'node:fs/promises'
+import { readFile, rename, writeFile, stat } from 'node:fs/promises'
 import express, { type Express } from 'express'
 import { createCodexBridgeMiddleware } from './codexAppServerBridge.js'
 import { createAuthSession } from './authMiddleware.js'
-import { createDirectoryListingHtml, createTextEditorHtml, decodeBrowsePath, getLocalDirectoryListing, isTextEditableFile, normalizeLocalPath } from './localBrowseUi.js'
+import { createDirectoryListingHtml, createTextEditorHtml, decodeBrowsePath, getLocalDirectoryListing, getLocalProjectDirectoryListing, isImagePath, isMarkdownPath, isTextEditableFile, normalizeLocalPath } from './localBrowseUi.js'
 import { WebSocketServer, type WebSocket } from 'ws'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -72,6 +72,33 @@ function readWildcardPathParam(value: unknown): string {
   return ''
 }
 
+function resolvePathInsideRoot(rootRaw: string, pathRaw: string): { rootPath: string; localPath: string } | null {
+  const rootPath = normalizeLocalPath(rootRaw)
+  const requestedPath = normalizeLocalPath(pathRaw) || rootPath
+  if (!rootPath || !requestedPath || !isAbsolute(rootPath) || !isAbsolute(requestedPath)) return null
+
+  const resolvedRoot = resolve(rootPath)
+  const resolvedPath = resolve(requestedPath)
+  const pathFromRoot = relative(resolvedRoot, resolvedPath)
+  if (pathFromRoot === '' || (pathFromRoot && !pathFromRoot.startsWith('..') && !isAbsolute(pathFromRoot))) {
+    return { rootPath: resolvedRoot, localPath: resolvedPath }
+  }
+  return null
+}
+
+function readShowHiddenQuery(value: unknown): boolean {
+  return typeof value === 'string' && ['1', 'true', 'yes', 'on'].includes(value.toLowerCase())
+}
+
+function normalizeProjectEntryName(value: string): string {
+  return value.trim().replace(/[\\/]+/gu, '').trim()
+}
+
+function isPathWithinRoot(rootPath: string, localPath: string): boolean {
+  const relativePath = relative(rootPath, localPath)
+  return relativePath === '' || (relativePath !== '' && !relativePath.startsWith('..') && !isAbsolute(relativePath))
+}
+
 export function createServer(options: ServerOptions = {}): ServerInstance {
   const app = express()
   const bridge = createCodexBridgeMiddleware()
@@ -128,8 +155,7 @@ export function createServer(options: ServerOptions = {}): ServerInstance {
   // 5. Return JSON directory listings for the integrated folder picker.
   app.get('/codex-local-directories', async (req, res) => {
     const rawPath = typeof req.query.path === 'string' ? req.query.path : ''
-    const showHidden = typeof req.query.showHidden === 'string'
-      && ['1', 'true', 'yes', 'on'].includes(req.query.showHidden.toLowerCase())
+    const showHidden = readShowHiddenQuery(req.query.showHidden)
     const localPath = normalizeLocalPath(rawPath)
     if (!localPath || !isAbsolute(localPath)) {
       res.status(400).json({ error: 'Expected absolute local directory path.' })
@@ -149,7 +175,144 @@ export function createServer(options: ServerOptions = {}): ServerInstance {
     }
   })
 
-  // 6. Serve local files by path to preserve relative asset loading for HTML.
+  // 6. Return JSON project file listings for the integrated project files view.
+  app.get('/codex-local-project-tree', async (req, res) => {
+    const rootRaw = typeof req.query.root === 'string' ? req.query.root : ''
+    const pathRaw = typeof req.query.path === 'string' ? req.query.path : ''
+    const resolved = resolvePathInsideRoot(rootRaw, pathRaw)
+    if (!resolved) {
+      res.status(400).json({ error: 'Expected absolute project root and in-project path.' })
+      return
+    }
+
+    try {
+      const fileStat = await stat(resolved.localPath)
+      if (!fileStat.isDirectory()) {
+        res.status(400).json({ error: 'Expected directory path.' })
+        return
+      }
+      const data = await getLocalProjectDirectoryListing(resolved.localPath, {
+        showHidden: readShowHiddenQuery(req.query.showHidden),
+      })
+      res.status(200).json({ data })
+    } catch {
+      res.status(404).json({ error: 'Directory not found.' })
+    }
+  })
+
+  app.get('/codex-local-project-file', async (req, res) => {
+    const rootRaw = typeof req.query.root === 'string' ? req.query.root : ''
+    const pathRaw = typeof req.query.path === 'string' ? req.query.path : ''
+    const resolved = resolvePathInsideRoot(rootRaw, pathRaw)
+    if (!resolved) {
+      res.status(400).json({ error: 'Expected absolute project root and in-project file path.' })
+      return
+    }
+
+    try {
+      const fileStat = await stat(resolved.localPath)
+      if (!fileStat.isFile()) {
+        res.status(400).json({ error: 'Expected file path.' })
+        return
+      }
+      const isImage = isImagePath(resolved.localPath)
+      if (!(await isTextEditableFile(resolved.localPath)) && !isImage) {
+        res.status(415).json({ error: 'Only text-like files can be opened in the project editor.' })
+        return
+      }
+
+      const content = isImage ? '' : await readFile(resolved.localPath, 'utf8')
+      res.status(200).json({
+        data: {
+          path: resolved.localPath,
+          content,
+          editable: !isImage,
+          markdown: !isImage && isMarkdownPath(resolved.localPath),
+          image: isImage,
+          size: fileStat.size,
+          mtimeMs: fileStat.mtimeMs,
+        },
+      })
+    } catch {
+      res.status(404).json({ error: 'File not found.' })
+    }
+  })
+
+  app.put('/codex-local-project-file', express.text({ type: '*/*', limit: '10mb' }), async (req, res) => {
+    const rootRaw = typeof req.query.root === 'string' ? req.query.root : ''
+    const pathRaw = typeof req.query.path === 'string' ? req.query.path : ''
+    const resolved = resolvePathInsideRoot(rootRaw, pathRaw)
+    if (!resolved) {
+      res.status(400).json({ error: 'Expected absolute project root and in-project file path.' })
+      return
+    }
+    if (!(await isTextEditableFile(resolved.localPath))) {
+      res.status(415).json({ error: 'Only text-like files are editable.' })
+      return
+    }
+
+    try {
+      await writeFile(resolved.localPath, typeof req.body === 'string' ? req.body : '', 'utf8')
+      const fileStat = await stat(resolved.localPath)
+      res.status(200).json({
+        data: {
+          path: resolved.localPath,
+          size: fileStat.size,
+          mtimeMs: fileStat.mtimeMs,
+        },
+      })
+    } catch {
+      res.status(404).json({ error: 'File not found.' })
+    }
+  })
+
+  app.patch('/codex-local-project-entry', async (req, res) => {
+    const rootRaw = typeof req.query.root === 'string' ? req.query.root : ''
+    const pathRaw = typeof req.query.path === 'string' ? req.query.path : ''
+    const nameRaw = typeof req.query.name === 'string' ? req.query.name : ''
+    const resolved = resolvePathInsideRoot(rootRaw, pathRaw)
+    const nextName = normalizeProjectEntryName(nameRaw)
+    if (!resolved || !nextName) {
+      res.status(400).json({ error: 'Expected absolute project root, in-project path, and new name.' })
+      return
+    }
+
+    if (resolved.localPath === resolved.rootPath) {
+      res.status(400).json({ error: 'Project root cannot be renamed from this view.' })
+      return
+    }
+
+    if (nextName !== nameRaw.trim() || nextName === '.' || nextName === '..') {
+      res.status(400).json({ error: 'New name must be a single path segment.' })
+      return
+    }
+
+    const parentPath = dirname(resolved.localPath)
+    const targetPath = resolve(join(parentPath, nextName))
+    if (!isPathWithinRoot(resolved.rootPath, targetPath)) {
+      res.status(400).json({ error: 'Renamed path must stay inside the project root.' })
+      return
+    }
+
+    if (existsSync(targetPath)) {
+      res.status(409).json({ error: 'A file or folder with that name already exists.' })
+      return
+    }
+
+    try {
+      await rename(resolved.localPath, targetPath)
+      res.status(200).json({
+        data: {
+          path: targetPath,
+          name: basename(targetPath),
+        },
+      })
+    } catch {
+      res.status(404).json({ error: 'Project entry not found.' })
+    }
+  })
+
+  // 7. Serve local files by path to preserve relative asset loading for HTML.
   app.get('/codex-local-browse/*path', async (req, res) => {
     const rawPath = readWildcardPathParam(req.params.path)
     const localPath = decodeBrowsePath(`/${rawPath}`)
@@ -177,7 +340,7 @@ export function createServer(options: ServerOptions = {}): ServerInstance {
     }
   })
 
-  // 7. Edit text-like local files.
+  // 8. Edit text-like local files.
   app.get('/codex-local-edit/*path', async (req, res) => {
     const rawPath = readWildcardPathParam(req.params.path)
     const localPath = decodeBrowsePath(`/${rawPath}`)
@@ -220,12 +383,12 @@ export function createServer(options: ServerOptions = {}): ServerInstance {
 
   const hasFrontendAssets = existsSync(spaEntryFile)
 
-  // 8. Static files from Vue build
+  // 9. Static files from Vue build
   if (hasFrontendAssets) {
     app.use(express.static(distDir))
   }
 
-  // 9. SPA fallback
+  // 10. SPA fallback
   app.use((_req, res) => {
     if (!hasFrontendAssets) {
       res

@@ -19,6 +19,63 @@ This file tracks manual regression and feature verification steps.
 #### Rollback/Cleanup
 - <cleanup action, if any>
 
+### Feature: Monochrome UI refresh
+
+#### Prerequisites
+- App is running from this repository.
+- Light and dark themes are both available from Settings.
+- Skills Hub route is accessible.
+
+#### Steps
+1. Open the new-thread/home screen in light theme.
+2. Confirm the sidebar, project rows, composer, folder controls, and primary actions use black/white/zinc styling without colorful accent panels.
+3. Open `Skills & Apps`, then inspect Plugins, Apps, MCPs, and Skills tabs.
+4. Confirm cards, badges, status labels, tabs, search controls, and sync panels remain readable and use the monochrome palette.
+5. Open an existing thread with rendered messages, file-change summaries, request cards, and code blocks if available.
+6. Switch to dark theme and repeat steps 1 through 5.
+
+#### Expected Results
+- The app presents a consistent black/white/zinc visual style across the main shell, composer, sidebar, Skills & Apps, thread messages, review/diff surfaces, and request states.
+- Light and dark theme surfaces keep readable contrast and no text overlaps its controls.
+- Status and error states remain distinguishable without green/red/yellow/blue accent backgrounds.
+
+#### Rollback/Cleanup
+- Reset appearance to the previous user preference.
+
+### Feature: Project folder files view
+
+#### Prerequisites
+- App is running from this repository.
+- At least one local project exists in the sidebar.
+- The project contains at least one Markdown file and one nested folder.
+- The project contains at least one image file, or a Markdown file with an image reference.
+- Light and dark themes are both available from Settings.
+
+#### Steps
+1. In light theme, hover a project row and click the folder action.
+2. Confirm the main content switches to the project files view for that project's root.
+3. Open a nested folder and use the back button to return to the project root.
+4. Open a Markdown file and confirm it renders in preview mode.
+5. Switch the Markdown file to edit mode, change text, save, then return to preview mode and confirm the change appears.
+6. Open a non-Markdown text file, edit it, and save.
+7. Return to a chat, send or draft a message, then reopen the same project's folder action.
+8. Confirm the project files view restores the last opened document instead of starting from the project root.
+9. Open an image file and confirm it renders inline in the reader.
+10. Open a Markdown file that references a local or remote image and confirm the image renders in preview mode.
+11. Switch to dark theme and repeat steps 1 through 5 and image preview.
+
+#### Expected Results
+- The project row provides direct access to the project folder without leaving the main app surface.
+- Folder navigation stays constrained to the project root.
+- Markdown files support preview and edit modes from the same view.
+- Reopening a project folder restores the most recent document for that project.
+- Image files and Markdown image references render inside the project files reader.
+- Text saves persist through the local project file API and the file list remains usable after saving.
+- Light and dark theme file list, editor, preview, buttons, and status text remain readable.
+
+#### Rollback/Cleanup
+- Revert any manual text edits made to sample project files.
+
 ### Feature: Thread heartbeat automations
 
 #### Prerequisites

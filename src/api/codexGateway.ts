@@ -365,6 +365,44 @@ export type LocalDirectoryListing = {
   entries: LocalDirectoryEntry[]
 }
 
+export type LocalProjectFileEntry = {
+  name: string
+  path: string
+  isDirectory: boolean
+  editable: boolean
+  markdown: boolean
+  image: boolean
+  size: number
+  mtimeMs: number
+}
+
+export type LocalProjectFileListing = {
+  path: string
+  parentPath: string
+  entries: LocalProjectFileEntry[]
+}
+
+export type LocalProjectTextFile = {
+  path: string
+  content: string
+  editable: boolean
+  markdown: boolean
+  image: boolean
+  size: number
+  mtimeMs: number
+}
+
+export type LocalProjectSavedFile = {
+  path: string
+  size: number
+  mtimeMs: number
+}
+
+export type LocalProjectRenamedEntry = {
+  path: string
+  name: string
+}
+
 export type ThreadTerminalSession = {
   id: string
   threadId: string
@@ -2651,6 +2689,139 @@ export async function listLocalDirectories(path: string, options?: { showHidden?
       const entryPath = typeof record.path === 'string' ? normalizePathForUi(record.path) : ''
       return name && entryPath ? [{ name, path: entryPath }] : []
     }),
+  }
+}
+
+export async function listLocalProjectFiles(
+  root: string,
+  path: string,
+  options?: { showHidden?: boolean },
+): Promise<LocalProjectFileListing> {
+  const query = new URLSearchParams({ root, path })
+  if (options?.showHidden === true) {
+    query.set('showHidden', '1')
+  }
+  const response = await fetch(`/codex-local-project-tree?${query.toString()}`)
+  const payload = await readJsonResponse(response)
+  if (!response.ok) {
+    const message = getErrorMessageFromPayload(payload, 'Failed to load project files')
+    throw new Error(message)
+  }
+
+  const record =
+    payload && typeof payload === 'object' && !Array.isArray(payload)
+      ? (payload as Record<string, unknown>)
+      : {}
+  const data =
+    record.data && typeof record.data === 'object' && !Array.isArray(record.data)
+      ? (record.data as Record<string, unknown>)
+      : {}
+  const entriesRaw = Array.isArray(data.entries) ? data.entries : []
+
+  return {
+    path: typeof data.path === 'string' ? normalizePathForUi(data.path) : '',
+    parentPath: typeof data.parentPath === 'string' ? normalizePathForUi(data.parentPath) : '',
+    entries: entriesRaw.flatMap((item) => {
+      if (!item || typeof item !== 'object' || Array.isArray(item)) return []
+      const record = item as Record<string, unknown>
+      const name = typeof record.name === 'string' ? record.name.trim() : ''
+      const entryPath = typeof record.path === 'string' ? normalizePathForUi(record.path) : ''
+      if (!name || !entryPath) return []
+      return [{
+        name,
+        path: entryPath,
+        isDirectory: record.isDirectory === true,
+        editable: record.editable === true,
+        markdown: record.markdown === true,
+        image: record.image === true,
+        size: typeof record.size === 'number' && Number.isFinite(record.size) ? record.size : 0,
+        mtimeMs: typeof record.mtimeMs === 'number' && Number.isFinite(record.mtimeMs) ? record.mtimeMs : 0,
+      }]
+    }),
+  }
+}
+
+export async function readLocalProjectTextFile(root: string, path: string): Promise<LocalProjectTextFile> {
+  const query = new URLSearchParams({ root, path })
+  const response = await fetch(`/codex-local-project-file?${query.toString()}`)
+  const payload = await readJsonResponse(response)
+  if (!response.ok) {
+    const message = getErrorMessageFromPayload(payload, 'Failed to open file')
+    throw new Error(message)
+  }
+
+  const record =
+    payload && typeof payload === 'object' && !Array.isArray(payload)
+      ? (payload as Record<string, unknown>)
+      : {}
+  const data =
+    record.data && typeof record.data === 'object' && !Array.isArray(record.data)
+      ? (record.data as Record<string, unknown>)
+      : {}
+
+  return {
+    path: typeof data.path === 'string' ? normalizePathForUi(data.path) : '',
+    content: typeof data.content === 'string' ? data.content : '',
+    editable: data.editable === true,
+    markdown: data.markdown === true,
+    image: data.image === true,
+    size: typeof data.size === 'number' && Number.isFinite(data.size) ? data.size : 0,
+    mtimeMs: typeof data.mtimeMs === 'number' && Number.isFinite(data.mtimeMs) ? data.mtimeMs : 0,
+  }
+}
+
+export async function saveLocalProjectTextFile(root: string, path: string, content: string): Promise<LocalProjectSavedFile> {
+  const query = new URLSearchParams({ root, path })
+  const response = await fetch(`/codex-local-project-file?${query.toString()}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+    body: content,
+  })
+  const payload = await readJsonResponse(response)
+  if (!response.ok) {
+    const message = getErrorMessageFromPayload(payload, 'Failed to save file')
+    throw new Error(message)
+  }
+
+  const record =
+    payload && typeof payload === 'object' && !Array.isArray(payload)
+      ? (payload as Record<string, unknown>)
+      : {}
+  const data =
+    record.data && typeof record.data === 'object' && !Array.isArray(record.data)
+      ? (record.data as Record<string, unknown>)
+      : {}
+
+  return {
+    path: typeof data.path === 'string' ? normalizePathForUi(data.path) : path,
+    size: typeof data.size === 'number' && Number.isFinite(data.size) ? data.size : content.length,
+    mtimeMs: typeof data.mtimeMs === 'number' && Number.isFinite(data.mtimeMs) ? data.mtimeMs : Date.now(),
+  }
+}
+
+export async function renameLocalProjectEntry(root: string, path: string, name: string): Promise<LocalProjectRenamedEntry> {
+  const query = new URLSearchParams({ root, path, name })
+  const response = await fetch(`/codex-local-project-entry?${query.toString()}`, {
+    method: 'PATCH',
+  })
+  const payload = await readJsonResponse(response)
+  if (!response.ok) {
+    const message = getErrorMessageFromPayload(payload, 'Failed to rename project entry')
+    throw new Error(message)
+  }
+
+  const record =
+    payload && typeof payload === 'object' && !Array.isArray(payload)
+      ? (payload as Record<string, unknown>)
+      : {}
+  const data =
+    record.data && typeof record.data === 'object' && !Array.isArray(record.data)
+      ? (record.data as Record<string, unknown>)
+      : {}
+
+  return {
+    path: typeof data.path === 'string' ? normalizePathForUi(data.path) : path,
+    name: typeof data.name === 'string' ? data.name.trim() : name,
   }
 }
 

@@ -296,6 +296,15 @@
             </span>
             <template #right>
               <div class="project-hover-controls">
+                <button
+                  class="thread-start-button"
+                  type="button"
+                  :aria-label="`Browse files ${getProjectDisplayName(group.projectName)}`"
+                  :title="t('Browse files')"
+                  @click.stop="onBrowseProjectFiles(group.projectName)"
+                >
+                  <IconTablerFolderOpen class="thread-icon" />
+                </button>
                 <div :ref="(el) => setProjectMenuWrapRef(group.projectName, el)" class="project-menu-wrap">
                   <button
                     class="project-menu-trigger"
@@ -314,7 +323,7 @@
                   >
                     <template v-if="projectMenuMode === 'actions'">
                       <button class="project-menu-item" type="button" @click="onBrowseProjectFiles(group.projectName)">
-                        Browse files
+                        {{ t('Browse files') }}
                       </button>
                       <button
                         v-if="projectGitRepoByName[group.projectName]"
@@ -2451,7 +2460,7 @@ onBeforeUnmount(() => {
 }
 
 .project-menu-item-danger {
-  @apply text-rose-700 hover:bg-rose-50;
+  @apply text-zinc-700 hover:bg-zinc-100;
 }
 
 .project-menu-label {
@@ -2511,7 +2520,7 @@ onBeforeUnmount(() => {
 }
 
 .thread-delete-button[data-confirming='true'] {
-  @apply z-10 h-5 min-w-16 px-1.5 bg-rose-600 text-white opacity-100 pointer-events-auto shadow-sm;
+  @apply z-10 h-5 min-w-16 px-1.5 bg-zinc-900 text-white opacity-100 pointer-events-auto shadow-sm;
 }
 
 .thread-delete-confirm-label {
@@ -2543,11 +2552,11 @@ onBeforeUnmount(() => {
 }
 
 .thread-row-request-chip[data-state='approval'] {
-  @apply border-emerald-500/20 bg-emerald-500/15 text-emerald-700;
+  @apply border-zinc-300 bg-zinc-100 text-zinc-700;
 }
 
 .thread-row-request-chip[data-state='response'] {
-  @apply border-sky-200 bg-sky-50 text-sky-700;
+  @apply border-zinc-300 bg-white text-zinc-700;
 }
 
 .thread-status-indicator {
@@ -2585,7 +2594,7 @@ onBeforeUnmount(() => {
 }
 
 .thread-menu-item-danger {
-  @apply text-rose-700 hover:bg-rose-50;
+  @apply text-zinc-700 hover:bg-zinc-100;
 }
 
 .thread-icon {
@@ -2605,7 +2614,7 @@ onBeforeUnmount(() => {
 }
 
 .thread-row-automation-chip {
-  @apply rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-amber-800;
+  @apply rounded-full bg-zinc-200 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-zinc-700;
 }
 
 .project-header-row:hover .project-icon-folder {
@@ -2629,7 +2638,7 @@ onBeforeUnmount(() => {
 .thread-status-indicator[data-state='unread'] {
   width: 6.6667px;
   height: 6.6667px;
-  @apply bg-blue-600;
+  @apply bg-zinc-900;
 }
 
 .thread-status-indicator[data-state='working'] {
@@ -2637,11 +2646,11 @@ onBeforeUnmount(() => {
 }
 
 .thread-status-indicator[data-state='awaiting-approval'] {
-  @apply bg-emerald-500;
+  @apply bg-zinc-700;
 }
 
 .thread-status-indicator[data-state='awaiting-response'] {
-  @apply bg-sky-500;
+  @apply bg-zinc-500;
 }
 
 .thread-row:hover .thread-status-indicator[data-state='unread'],
@@ -2689,7 +2698,7 @@ onBeforeUnmount(() => {
 }
 
 .rename-thread-button-danger {
-  @apply bg-rose-600 text-white hover:bg-rose-700;
+  @apply bg-zinc-900 text-white hover:bg-black;
 }
 
 .automation-thread-panel {
@@ -2710,6 +2719,6 @@ onBeforeUnmount(() => {
 }
 
 .automation-thread-error {
-  @apply mb-0 text-rose-600;
+  @apply mb-0 text-zinc-700;
 }
 </style>

@@ -1843,11 +1843,11 @@ watch(
 }
 
 .thread-composer-folder-chip {
-  @apply inline-flex items-center gap-1 rounded-md border border-amber-200 bg-amber-50 px-2 py-0.5 text-xs text-amber-800;
+  @apply inline-flex items-center gap-1 rounded-md border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-xs text-zinc-700;
 }
 
 .thread-composer-folder-chip-icon {
-  @apply h-3.5 w-3.5 text-amber-600 shrink-0;
+  @apply h-3.5 w-3.5 text-zinc-500 shrink-0;
 }
 
 .thread-composer-folder-chip-name {
@@ -1855,11 +1855,11 @@ watch(
 }
 
 .thread-composer-folder-chip-meta {
-  @apply text-amber-700/90;
+  @apply text-zinc-500;
 }
 
 .thread-composer-folder-chip-remove {
-  @apply ml-0.5 inline-flex h-3.5 w-3.5 items-center justify-center rounded-full border-0 bg-transparent text-amber-600 transition hover:bg-amber-200 hover:text-amber-800 text-xs leading-none p-0;
+  @apply ml-0.5 inline-flex h-3.5 w-3.5 items-center justify-center rounded-full border-0 bg-transparent text-zinc-400 transition hover:bg-zinc-200 hover:text-zinc-800 text-xs leading-none p-0;
 }
 
 .thread-composer-file-chip {
@@ -1883,7 +1883,7 @@ watch(
 }
 
 .thread-composer-skill-chip {
-  @apply inline-flex items-center gap-1 rounded-md border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-xs text-emerald-700;
+  @apply inline-flex items-center gap-1 rounded-md border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-xs text-zinc-700;
 }
 
 .thread-composer-skill-chip-name {
@@ -1891,7 +1891,7 @@ watch(
 }
 
 .thread-composer-skill-chip-remove {
-  @apply ml-0.5 inline-flex h-3.5 w-3.5 items-center justify-center rounded-full border-0 bg-transparent text-emerald-500 transition hover:bg-emerald-200 hover:text-emerald-700 text-xs leading-none p-0;
+  @apply ml-0.5 inline-flex h-3.5 w-3.5 items-center justify-center rounded-full border-0 bg-transparent text-zinc-400 transition hover:bg-zinc-200 hover:text-zinc-800 text-xs leading-none p-0;
 }
 
 .thread-composer-rate-limit {
@@ -1907,16 +1907,16 @@ watch(
 }
 
 .thread-composer-context-usage-inline {
-  --context-usage-accent: rgb(34 197 94);
+  --context-usage-accent: rgb(39 39 42);
   @apply ml-auto inline-flex min-w-0 max-w-[56%] items-center gap-2 text-right;
 }
 
 .thread-composer-context-usage-inline.is-warning {
-  --context-usage-accent: rgb(245 158 11);
+  --context-usage-accent: rgb(82 82 91);
 }
 
 .thread-composer-context-usage-inline.is-danger {
-  --context-usage-accent: rgb(239 68 68);
+  --context-usage-accent: rgb(24 24 27);
 }
 
 .thread-composer-context-usage-inline-value {
@@ -2087,7 +2087,7 @@ watch(
 }
 
 .thread-composer-attach-switch.is-on {
-  @apply bg-emerald-600;
+  @apply bg-zinc-900;
 }
 
 .thread-composer-attach-switch.is-on::after {
@@ -2125,7 +2125,7 @@ watch(
 }
 
 .thread-composer-mic--active {
-  @apply bg-red-100 text-red-600 hover:bg-red-200 hover:text-red-700;
+  @apply bg-zinc-900 text-white hover:bg-black hover:text-white;
 }
 
 .thread-composer-mic-icon {
@@ -2145,7 +2145,7 @@ watch(
 }
 
 .thread-composer-dictation-error {
-  @apply mb-2 px-1 text-xs text-amber-700;
+  @apply mb-2 px-1 text-xs text-zinc-600;
 }
 
 .thread-composer-submit {
@@ -2153,7 +2153,7 @@ watch(
 }
 
 .thread-composer-submit--queue {
-  @apply bg-amber-600 hover:bg-amber-700;
+  @apply bg-zinc-700 hover:bg-zinc-900;
 }
 
 .thread-composer-submit-icon {

@@ -4221,11 +4221,11 @@ onBeforeUnmount(() => {
 }
 
 .conversation-loading {
-  @apply m-0 px-6 text-sm text-slate-500;
+  @apply m-0 px-6 text-sm text-zinc-500;
 }
 
 .conversation-empty {
-  @apply m-0 px-6 text-sm text-slate-500;
+  @apply m-0 px-6 text-sm text-zinc-500;
 }
 
 .conversation-list {
@@ -4237,9 +4237,9 @@ onBeforeUnmount(() => {
 }
 
 .load-more-button {
-  @apply px-4 py-1.5 text-xs rounded-full border border-slate-300 dark:border-slate-600
-         text-slate-500 dark:text-slate-400 bg-transparent
-         hover:bg-slate-100 dark:hover:bg-slate-800
+  @apply px-4 py-1.5 text-xs rounded-full border border-zinc-300 dark:border-zinc-600
+         text-zinc-500 dark:text-zinc-400 bg-transparent
+         hover:bg-zinc-100 dark:hover:bg-zinc-800
          disabled:opacity-40 disabled:cursor-not-allowed
          transition-colors cursor-pointer;
 }
@@ -4274,7 +4274,7 @@ onBeforeUnmount(() => {
 }
 
 .jump-to-latest-button {
-  @apply absolute left-1/2 bottom-4 z-20 inline-flex h-11 w-11 -translate-x-1/2 items-center justify-center rounded-full border border-slate-300 bg-white/96 text-slate-700 shadow-lg shadow-slate-900/10 transition hover:-translate-x-1/2 hover:-translate-y-0.5 hover:bg-white hover:text-slate-900;
+  @apply absolute left-1/2 bottom-4 z-20 inline-flex h-11 w-11 -translate-x-1/2 items-center justify-center rounded-full border border-zinc-300 bg-white/96 text-zinc-700 shadow-lg shadow-zinc-900/10 transition hover:-translate-x-1/2 hover:-translate-y-0.5 hover:bg-white hover:text-zinc-900;
 }
 
 .jump-to-latest-icon {
@@ -4286,19 +4286,19 @@ onBeforeUnmount(() => {
 }
 
 .request-card {
-  @apply w-full max-w-[min(var(--chat-column-max,45rem),100%)] rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 flex flex-col gap-2;
+  @apply w-full max-w-[min(var(--chat-column-max,45rem),100%)] rounded-xl border border-zinc-300 bg-zinc-50 px-4 py-3 flex flex-col gap-2;
 }
 
 .request-title {
-  @apply m-0 text-sm leading-5 font-semibold text-amber-900;
+  @apply m-0 text-sm leading-5 font-semibold text-zinc-900;
 }
 
 .request-meta {
-  @apply m-0 text-xs leading-4 text-amber-700;
+  @apply m-0 text-xs leading-4 text-zinc-600;
 }
 
 .request-reason {
-  @apply m-0 text-sm leading-5 text-amber-900 whitespace-pre-wrap break-words;
+  @apply m-0 text-sm leading-5 text-zinc-800 whitespace-pre-wrap break-words;
   overflow-wrap: anywhere;
 }
 
@@ -4307,11 +4307,11 @@ onBeforeUnmount(() => {
 }
 
 .request-button {
-  @apply rounded-md border border-amber-300 bg-white px-3 py-1.5 text-xs text-amber-900 hover:bg-amber-100 transition;
+  @apply rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-xs text-zinc-800 hover:bg-zinc-100 transition;
 }
 
 .request-button-primary {
-  @apply border-amber-500 bg-amber-500 text-white hover:bg-amber-600;
+  @apply border-zinc-900 bg-zinc-900 text-white hover:bg-black;
 }
 
 .request-user-input {
@@ -4323,27 +4323,27 @@ onBeforeUnmount(() => {
 }
 
 .request-question-title {
-  @apply m-0 text-sm leading-5 font-medium text-amber-900;
+  @apply m-0 text-sm leading-5 font-medium text-zinc-900;
 }
 
 .request-question-text {
-  @apply m-0 text-xs leading-4 text-amber-800;
+  @apply m-0 text-xs leading-4 text-zinc-700;
 }
 
 .request-question-option-description {
-  @apply m-0 text-xs leading-4 text-amber-700;
+  @apply m-0 text-xs leading-4 text-zinc-600;
 }
 
 .request-link {
-  @apply inline-flex w-fit rounded-md border border-amber-300 bg-white px-3 py-1.5 text-xs text-amber-900 hover:bg-amber-100 transition;
+  @apply inline-flex w-fit rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-xs text-zinc-800 hover:bg-zinc-100 transition;
 }
 
 .request-select {
-  @apply h-8 rounded-md border border-amber-300 bg-white px-2 text-sm text-amber-900;
+  @apply h-8 rounded-md border border-zinc-300 bg-white px-2 text-sm text-zinc-900;
 }
 
 .request-input {
-  @apply h-8 rounded-md border border-amber-300 bg-white px-2 text-sm text-amber-900 placeholder:text-amber-500;
+  @apply h-8 rounded-md border border-zinc-300 bg-white px-2 text-sm text-zinc-900 placeholder:text-zinc-400;
 }
 
 .request-checkbox-list {
@@ -4351,7 +4351,7 @@ onBeforeUnmount(() => {
 }
 
 .request-checkbox-row {
-  @apply flex items-center gap-2 text-sm text-amber-900;
+  @apply flex items-center gap-2 text-sm text-zinc-900;
 }
 
 .live-overlay-inline {
@@ -4378,7 +4378,7 @@ onBeforeUnmount(() => {
 }
 
 .live-overlay-error {
-  @apply m-0 text-sm leading-5 text-rose-600 whitespace-pre-wrap;
+  @apply m-0 text-sm leading-5 text-zinc-700 whitespace-pre-wrap;
 }
 
 .message-body {
@@ -4400,20 +4400,20 @@ onBeforeUnmount(() => {
 }
 
 .message-copy-button {
-  @apply inline-flex items-center gap-0.5 rounded-full border border-slate-200 bg-white/90 px-1.25 py-0.5 text-[9px] font-medium leading-none text-slate-500 transition hover:border-slate-300 hover:bg-white hover:text-slate-900;
+  @apply inline-flex items-center gap-0.5 rounded-full border border-zinc-200 bg-white/90 px-1.25 py-0.5 text-[9px] font-medium leading-none text-zinc-500 transition hover:border-zinc-300 hover:bg-white hover:text-zinc-900;
 }
 
 .message-fork-button {
-  @apply inline-flex items-center gap-0.5 px-0.5 py-0 text-[9px] font-medium leading-none text-slate-500 transition hover:text-slate-900;
+  @apply inline-flex items-center gap-0.5 px-0.5 py-0 text-[9px] font-medium leading-none text-zinc-500 transition hover:text-zinc-900;
 }
 
 
 .message-copy-button[data-copied='true'] {
-  @apply border-emerald-200 bg-emerald-50 text-emerald-700;
+  @apply border-zinc-300 bg-zinc-100 text-zinc-800;
 }
 
 .message-edit-button {
-  @apply inline-flex items-center gap-0.5 px-0.5 py-0 text-[9px] font-medium leading-none text-amber-600/70 transition hover:text-amber-700;
+  @apply inline-flex items-center gap-0.5 px-0.5 py-0 text-[9px] font-medium leading-none text-zinc-500 transition hover:text-zinc-900;
 }
 
 .message-fork-icon,
@@ -4445,7 +4445,7 @@ onBeforeUnmount(() => {
 }
 
 .message-image-button {
-  @apply block rounded-xl overflow-hidden border border-slate-300 bg-white p-0 transition hover:border-slate-400;
+  @apply block rounded-xl overflow-hidden border border-zinc-300 bg-white p-0 transition hover:border-zinc-400;
 }
 
 .message-image-preview {
@@ -4481,7 +4481,7 @@ onBeforeUnmount(() => {
 }
 
 .plan-card {
-  @apply flex max-w-[min(var(--chat-card-max,76ch),100%)] flex-col gap-3 rounded-2xl border border-sky-200 bg-sky-50 px-4 py-3 text-slate-900;
+  @apply flex max-w-[min(var(--chat-card-max,76ch),100%)] flex-col gap-3 rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-zinc-900;
 }
 
 .plan-card-header {
@@ -4489,15 +4489,15 @@ onBeforeUnmount(() => {
 }
 
 .plan-card-title {
-  @apply m-0 text-sm font-semibold leading-5 text-sky-900;
+  @apply m-0 text-sm font-semibold leading-5 text-zinc-900;
 }
 
 .plan-card-badge {
-  @apply inline-flex items-center rounded-full bg-sky-200 px-2 py-0.5 text-[11px] font-medium leading-4 text-sky-900;
+  @apply inline-flex items-center rounded-full bg-zinc-200 px-2 py-0.5 text-[11px] font-medium leading-4 text-zinc-800;
 }
 
 .plan-card-explanation {
-  @apply text-slate-700;
+  @apply text-zinc-700;
 }
 
 .plan-card-markdown {
@@ -4515,11 +4515,11 @@ onBeforeUnmount(() => {
 }
 
 .plan-card-markdown :deep(.message-text) {
-  @apply text-sm leading-relaxed whitespace-pre-wrap text-slate-800;
+  @apply text-sm leading-relaxed whitespace-pre-wrap text-zinc-800;
 }
 
 .plan-card-markdown :deep(.message-heading) {
-  @apply text-slate-900 tracking-tight;
+  @apply text-zinc-900 tracking-tight;
 }
 
 .plan-card-markdown :deep(.message-heading-h1) {
@@ -4543,15 +4543,15 @@ onBeforeUnmount(() => {
 }
 
 .plan-card-markdown :deep(.message-heading-h6) {
-  @apply text-xs font-semibold leading-snug uppercase tracking-[0.04em] text-slate-600;
+  @apply text-xs font-semibold leading-snug uppercase tracking-[0.04em] text-zinc-600;
 }
 
 .plan-card-markdown :deep(.message-blockquote) {
-  @apply border-l-4 border-slate-300 pl-4 py-1 text-sm leading-relaxed whitespace-pre-wrap text-slate-700 bg-slate-50/70 rounded-r-lg;
+  @apply border-l-4 border-zinc-300 pl-4 py-1 text-sm leading-relaxed whitespace-pre-wrap text-zinc-700 bg-zinc-50/70 rounded-r-lg;
 }
 
 .plan-card-markdown :deep(.message-list) {
-  @apply pl-5 text-sm leading-relaxed text-slate-800 flex flex-col gap-1.5;
+  @apply pl-5 text-sm leading-relaxed text-zinc-800 flex flex-col gap-1.5;
 }
 
 .plan-card-markdown :deep(.message-list-unordered) {
@@ -4583,15 +4583,15 @@ onBeforeUnmount(() => {
 }
 
 .plan-card-markdown :deep(.message-task-checkbox) {
-  @apply mt-0.5 text-sm leading-none text-slate-500 select-none;
+  @apply mt-0.5 text-sm leading-none text-zinc-500 select-none;
 }
 
 .plan-card-markdown :deep(.message-code-block) {
-  @apply overflow-hidden rounded-xl border border-slate-200 bg-slate-950/95 text-slate-100;
+  @apply overflow-hidden rounded-xl border border-zinc-200 bg-zinc-950/95 text-zinc-100;
 }
 
 .plan-card-markdown :deep(.message-code-language) {
-  @apply border-b border-slate-800 bg-slate-900/90 px-3 py-2 text-[11px] font-medium uppercase tracking-[0.08em] text-slate-400;
+  @apply border-b border-zinc-800 bg-zinc-900/90 px-3 py-2 text-[11px] font-medium uppercase tracking-[0.08em] text-zinc-400;
 }
 
 .plan-card-markdown :deep(.message-code-pre) {
@@ -4599,11 +4599,11 @@ onBeforeUnmount(() => {
 }
 
 .plan-card-markdown :deep(.message-inline-code) {
-  @apply rounded-md bg-slate-200/80 px-1.5 py-0.5 font-mono text-[0.9em] text-slate-900;
+  @apply rounded-md bg-zinc-200/80 px-1.5 py-0.5 font-mono text-[0.9em] text-zinc-900;
 }
 
 .plan-card-markdown :deep(.message-file-link) {
-  @apply text-sky-700 underline decoration-sky-300 underline-offset-2;
+  @apply text-zinc-900 underline decoration-zinc-300 underline-offset-2;
 }
 
 .plan-card-markdown :deep(.message-table) {
@@ -4615,27 +4615,27 @@ onBeforeUnmount(() => {
 }
 
 .plan-step-item {
-  @apply flex items-start gap-2 rounded-xl border border-white/70 bg-white/80 px-3 py-2 text-sm leading-relaxed text-slate-800;
+  @apply flex items-start gap-2 rounded-xl border border-white/70 bg-white/80 px-3 py-2 text-sm leading-relaxed text-zinc-800;
 }
 
 .plan-step-item[data-status='completed'] {
-  @apply border-emerald-200 bg-emerald-50/80;
+  @apply border-zinc-300 bg-white;
 }
 
 .plan-step-item[data-status='inProgress'] {
-  @apply border-amber-200 bg-amber-50/80;
+  @apply border-zinc-400 bg-zinc-100;
 }
 
 .plan-step-status {
-  @apply mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-200 text-xs font-semibold text-slate-700;
+  @apply mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-xs font-semibold text-zinc-700;
 }
 
 .plan-step-status[data-status='completed'] {
-  @apply bg-emerald-200 text-emerald-900;
+  @apply bg-zinc-900 text-white;
 }
 
 .plan-step-status[data-status='inProgress'] {
-  @apply bg-amber-200 text-amber-900;
+  @apply bg-zinc-700 text-white;
 }
 
 .plan-step-text {
@@ -4647,16 +4647,16 @@ onBeforeUnmount(() => {
 }
 
 .plan-card-implement-button {
-  @apply inline-flex items-center rounded-full border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-800 transition hover:border-slate-400 hover:bg-slate-50;
+  @apply inline-flex items-center rounded-full border border-zinc-300 bg-white px-3 py-1.5 text-xs font-medium text-zinc-800 transition hover:border-zinc-400 hover:bg-zinc-50;
 }
 
 .message-text {
-  @apply m-0 text-sm leading-relaxed whitespace-pre-wrap break-words text-slate-800;
+  @apply m-0 text-sm leading-relaxed whitespace-pre-wrap break-words text-zinc-800;
   overflow-wrap: anywhere;
 }
 
 .message-heading {
-  @apply m-0 text-slate-900 tracking-tight;
+  @apply m-0 text-zinc-900 tracking-tight;
 }
 
 .message-heading-h1 {
@@ -4680,16 +4680,16 @@ onBeforeUnmount(() => {
 }
 
 .message-heading-h6 {
-  @apply text-xs font-semibold leading-snug uppercase tracking-[0.04em] text-slate-600;
+  @apply text-xs font-semibold leading-snug uppercase tracking-[0.04em] text-zinc-600;
 }
 
 .message-blockquote {
-  @apply m-0 border-l-4 border-slate-300 pl-4 py-1 text-sm leading-relaxed whitespace-pre-wrap break-words text-slate-700 bg-slate-50/70 rounded-r-lg;
+  @apply m-0 border-l-4 border-zinc-300 pl-4 py-1 text-sm leading-relaxed whitespace-pre-wrap break-words text-zinc-700 bg-zinc-50/70 rounded-r-lg;
   overflow-wrap: anywhere;
 }
 
 .message-list {
-  @apply m-0 pl-5 text-sm leading-relaxed text-slate-800 flex flex-col gap-1.5;
+  @apply m-0 pl-5 text-sm leading-relaxed text-zinc-800 flex flex-col gap-1.5;
 }
 
 .message-list-unordered {
@@ -4726,7 +4726,7 @@ onBeforeUnmount(() => {
 }
 
 .message-task-checkbox {
-  @apply mt-0.5 text-sm leading-none text-slate-500 select-none;
+  @apply mt-0.5 text-sm leading-none text-zinc-500 select-none;
 }
 
 .message-table-wrap {
@@ -4734,12 +4734,12 @@ onBeforeUnmount(() => {
 }
 
 .message-table {
-  @apply min-w-full border-separate border-spacing-0 overflow-hidden rounded-xl border border-slate-200 bg-white text-sm text-slate-800;
+  @apply min-w-full border-separate border-spacing-0 overflow-hidden rounded-xl border border-zinc-200 bg-white text-sm text-zinc-800;
 }
 
 .message-table-head-cell,
 .message-table-cell {
-  @apply border-b border-l border-slate-200 px-3 py-2 align-top whitespace-pre-wrap break-words;
+  @apply border-b border-l border-zinc-200 px-3 py-2 align-top whitespace-pre-wrap break-words;
   overflow-wrap: anywhere;
 }
 
@@ -4749,7 +4749,7 @@ onBeforeUnmount(() => {
 }
 
 .message-table-head-cell {
-  @apply bg-slate-100 font-semibold text-slate-900;
+  @apply bg-zinc-100 font-semibold text-zinc-900;
 }
 
 .message-table-body-row:last-child .message-table-cell {
@@ -4757,7 +4757,7 @@ onBeforeUnmount(() => {
 }
 
 .message-bold-text {
-  @apply font-semibold text-slate-900;
+  @apply font-semibold text-zinc-900;
 }
 
 .message-italic-text {
@@ -4765,7 +4765,7 @@ onBeforeUnmount(() => {
 }
 
 .message-strikethrough-text {
-  @apply line-through text-slate-500;
+  @apply line-through text-zinc-500;
 }
 
 .message-markdown-image {
@@ -4773,15 +4773,15 @@ onBeforeUnmount(() => {
 }
 
 .message-inline-code {
-  @apply rounded-md border border-slate-200 bg-slate-100/60 px-1.5 py-0.5 text-[0.875em] leading-[1.4] text-slate-900 font-mono;
+  @apply rounded-md border border-zinc-200 bg-zinc-100/60 px-1.5 py-0.5 text-[0.875em] leading-[1.4] text-zinc-900 font-mono;
 }
 
 .message-code-block {
-  @apply overflow-hidden rounded-xl border border-slate-200 bg-slate-950 text-slate-100;
+  @apply overflow-hidden rounded-xl border border-zinc-200 bg-zinc-950 text-zinc-100;
 }
 
 .message-code-language {
-  @apply border-b border-slate-800 px-3 py-2 text-[11px] font-mono uppercase tracking-[0.08em] text-slate-400;
+  @apply border-b border-zinc-800 px-3 py-2 text-[11px] font-mono uppercase tracking-[0.08em] text-zinc-400;
 }
 
 .message-code-pre {
@@ -4793,7 +4793,7 @@ onBeforeUnmount(() => {
 }
 
 .message-file-link {
-  @apply text-sm leading-relaxed text-[#0969da] no-underline hover:text-[#1f6feb] hover:underline underline-offset-2;
+  @apply text-sm leading-relaxed text-zinc-900 underline decoration-zinc-300 underline-offset-2 hover:text-black;
 }
 
 .file-link-context-menu {
@@ -4805,7 +4805,7 @@ onBeforeUnmount(() => {
 }
 
 .message-divider {
-  @apply m-0 border-0 h-px bg-slate-300/80;
+  @apply m-0 border-0 h-px bg-zinc-300/80;
 }
 
 .message-stack[data-role='user'] {
@@ -4818,7 +4818,7 @@ onBeforeUnmount(() => {
 }
 
 .message-card[data-role='user'] {
-  @apply rounded-2xl bg-slate-200 px-4 py-3 max-w-[min(560px,100%)];
+  @apply rounded-2xl bg-zinc-200 px-4 py-3 max-w-[min(560px,100%)];
   width: fit-content;
   margin-left: auto;
   align-self: flex-end;
@@ -4856,7 +4856,7 @@ onBeforeUnmount(() => {
 }
 
 .worked-separator-text {
-  @apply m-0 text-sm leading-relaxed font-normal text-slate-800;
+  @apply m-0 text-sm leading-relaxed font-normal text-zinc-800;
 }
 
 .worked-details {
@@ -4876,7 +4876,7 @@ onBeforeUnmount(() => {
 }
 
 .image-modal-close {
-  @apply absolute top-2 right-2 z-10 w-10 h-10 rounded-full bg-white/90 text-slate-900 border border-slate-300 flex items-center justify-center;
+  @apply absolute top-2 right-2 z-10 w-10 h-10 rounded-full bg-white/90 text-zinc-900 border border-zinc-300 flex items-center justify-center;
 }
 
 .image-modal-image {
@@ -4939,15 +4939,15 @@ onBeforeUnmount(() => {
 }
 
 .cmd-status-running .cmd-status {
-  @apply text-amber-600;
+  @apply text-zinc-600;
 }
 
 .cmd-status-ok .cmd-status {
-  @apply text-emerald-600;
+  @apply text-zinc-700;
 }
 
 .cmd-status-error .cmd-status {
-  @apply text-rose-600;
+  @apply text-zinc-900;
 }
 
 .cmd-output-wrap {
@@ -5028,19 +5028,19 @@ onBeforeUnmount(() => {
 }
 
 .file-change-badge[data-operation='add'] {
-  @apply bg-emerald-50 text-emerald-700;
+  @apply bg-zinc-100 text-zinc-800;
 }
 
 .file-change-badge[data-operation='update'] {
-  @apply bg-sky-50 text-sky-700;
+  @apply bg-zinc-100 text-zinc-800;
 }
 
 .file-change-badge[data-operation='delete'] {
-  @apply bg-rose-50 text-rose-700;
+  @apply bg-zinc-200 text-zinc-900;
 }
 
 .file-change-badge[data-operation='move'] {
-  @apply bg-amber-50 text-amber-700;
+  @apply bg-zinc-100 text-zinc-800;
 }
 
 .file-change-path {
@@ -5048,7 +5048,7 @@ onBeforeUnmount(() => {
 }
 
 .file-change-path-button {
-  @apply min-w-0 border-0 bg-transparent p-0 text-left font-mono text-[13px] text-[#0969da] hover:text-[#1f6feb] hover:underline underline-offset-2;
+  @apply min-w-0 border-0 bg-transparent p-0 text-left font-mono text-[13px] text-zinc-900 hover:text-black hover:underline underline-offset-2;
 }
 
 .file-change-arrow {
@@ -5064,11 +5064,11 @@ onBeforeUnmount(() => {
 }
 
 .file-change-signed-count[data-tone='add'] {
-  @apply text-emerald-600;
+  @apply text-zinc-700;
 }
 
 .file-change-signed-count[data-tone='remove'] {
-  @apply text-rose-600;
+  @apply text-zinc-900;
 }
 
 .diff-viewer-backdrop {
@@ -5104,7 +5104,7 @@ onBeforeUnmount(() => {
 }
 
 .diff-viewer-file-button[data-active='true'] {
-  @apply border-sky-200 bg-white shadow-sm;
+  @apply border-zinc-400 bg-white shadow-sm;
 }
 
 .diff-viewer-file-label {
@@ -5200,34 +5200,34 @@ onBeforeUnmount(() => {
 
 .diff-viewer-line[data-kind='meta'] .diff-viewer-line-code,
 .diff-viewer-line[data-kind='meta'] .diff-viewer-line-marker {
-  @apply text-sky-300;
+  @apply text-zinc-300;
 }
 
 .diff-viewer-line[data-kind='hunk'] {
-  @apply bg-sky-950/40;
+  @apply bg-zinc-900;
 }
 
 .diff-viewer-line[data-kind='hunk'] .diff-viewer-line-code,
 .diff-viewer-line[data-kind='hunk'] .diff-viewer-line-marker {
-  @apply text-sky-300;
+  @apply text-zinc-300;
 }
 
 .diff-viewer-line[data-kind='add'] {
-  background: rgba(20, 83, 45, 0.38);
+  background: rgba(82, 82, 91, 0.34);
 }
 
 .diff-viewer-line[data-kind='add'] .diff-viewer-line-marker,
 .diff-viewer-line[data-kind='add'] .diff-viewer-line-code {
-  @apply text-emerald-200;
+  @apply text-zinc-100;
 }
 
 .diff-viewer-line[data-kind='remove'] {
-  background: rgba(127, 29, 29, 0.32);
+  background: rgba(39, 39, 42, 0.82);
 }
 
 .diff-viewer-line[data-kind='remove'] .diff-viewer-line-marker,
 .diff-viewer-line[data-kind='remove'] .diff-viewer-line-code {
-  @apply text-rose-200;
+  @apply text-zinc-300;
 }
 
 .diff-viewer-line[data-kind='context'] {

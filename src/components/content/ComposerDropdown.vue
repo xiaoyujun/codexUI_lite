@@ -163,7 +163,7 @@ onBeforeUnmount(() => {
 }
 
 .composer-dropdown-prefix-icon {
-  @apply h-3.5 w-3.5 shrink-0 text-amber-500;
+  @apply h-3.5 w-3.5 shrink-0 text-zinc-500;
 }
 
 .composer-dropdown-trigger:disabled {

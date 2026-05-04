@@ -6,6 +6,9 @@ type DirectoryItem = {
   path: string
   isDirectory: boolean
   editable: boolean
+  markdown: boolean
+  image: boolean
+  size: number
   mtimeMs: number
 }
 
@@ -20,14 +23,35 @@ export type LocalDirectoryListing = {
   entries: LocalDirectoryListingEntry[]
 }
 
+export type LocalProjectFileEntry = {
+  name: string
+  path: string
+  isDirectory: boolean
+  editable: boolean
+  markdown: boolean
+  image: boolean
+  size: number
+  mtimeMs: number
+}
+
+export type LocalProjectDirectoryListing = {
+  path: string
+  parentPath: string
+  entries: LocalProjectFileEntry[]
+}
+
 type LocalDirectoryListingOptions = {
   showHidden?: boolean
 }
 
 const TEXT_EDITABLE_EXTENSIONS = new Set([
-  '.txt', '.md', '.json', '.js', '.ts', '.tsx', '.jsx', '.css', '.scss',
+  '.txt', '.md', '.mdx', '.markdown', '.json', '.js', '.ts', '.tsx', '.jsx', '.css', '.scss',
   '.html', '.htm', '.xml', '.yml', '.yaml', '.log', '.csv', '.env', '.py',
   '.sh', '.toml', '.ini', '.conf', '.sql', '.bat', '.cmd', '.ps1',
+])
+
+const IMAGE_PREVIEW_EXTENSIONS = new Set([
+  '.avif', '.bmp', '.gif', '.jpeg', '.jpg', '.png', '.svg', '.webp',
 ])
 
 function languageForPath(pathValue: string): string {
@@ -80,6 +104,15 @@ export function decodeBrowsePath(rawPath: string): string {
 
 export function isTextEditablePath(pathValue: string): boolean {
   return TEXT_EDITABLE_EXTENSIONS.has(extname(pathValue).toLowerCase())
+}
+
+export function isMarkdownPath(pathValue: string): boolean {
+  const extension = extname(pathValue).toLowerCase()
+  return extension === '.md' || extension === '.markdown' || extension === '.mdx'
+}
+
+export function isImagePath(pathValue: string): boolean {
+  return IMAGE_PREVIEW_EXTENSIONS.has(extname(pathValue).toLowerCase())
 }
 
 function isHiddenName(value: string): boolean {
@@ -152,7 +185,7 @@ function escapeForInlineScriptString(value: string): string {
     .replace(/\u2029/gu, '\\u2029')
 }
 
-async function getDirectoryItems(localPath: string): Promise<DirectoryItem[]> {
+async function getDirectoryItems(localPath: string, options: LocalDirectoryListingOptions = {}): Promise<DirectoryItem[]> {
   const entries = await readdir(localPath, { withFileTypes: true })
   const withMeta = await Promise.all(entries.map(async (entry) => {
     const entryPath = join(localPath, entry.name)
@@ -163,15 +196,20 @@ async function getDirectoryItems(localPath: string): Promise<DirectoryItem[]> {
       path: entryPath,
       isDirectory: entry.isDirectory(),
       editable,
+      markdown: !entry.isDirectory() && isMarkdownPath(entryPath),
+      image: !entry.isDirectory() && isImagePath(entryPath),
+      size: entryStat.size,
       mtimeMs: entryStat.mtimeMs,
     }
   }))
-  return withMeta.sort((a, b) => {
-    if (b.mtimeMs !== a.mtimeMs) return b.mtimeMs - a.mtimeMs
-    if (a.isDirectory && !b.isDirectory) return -1
-    if (!a.isDirectory && b.isDirectory) return 1
-    return a.name.localeCompare(b.name)
-  })
+  return withMeta
+    .filter((entry) => options.showHidden === true || !isHiddenName(entry.name))
+    .sort((a, b) => {
+      if (b.mtimeMs !== a.mtimeMs) return b.mtimeMs - a.mtimeMs
+      if (a.isDirectory && !b.isDirectory) return -1
+      if (!a.isDirectory && b.isDirectory) return 1
+      return a.name.localeCompare(b.name)
+    })
 }
 
 function projectCreationTargetPath(parentPath: string, newProjectName: string): string {
@@ -237,6 +275,28 @@ export async function getLocalDirectoryListing(
     path: localPath,
     parentPath: dirname(localPath),
     entries: directories,
+  }
+}
+
+export async function getLocalProjectDirectoryListing(
+  localPath: string,
+  options: LocalDirectoryListingOptions = {},
+): Promise<LocalProjectDirectoryListing> {
+  const items = await getDirectoryItems(localPath, options)
+
+  return {
+    path: localPath,
+    parentPath: dirname(localPath),
+    entries: items.map((item) => ({
+      name: item.name,
+      path: item.path,
+      isDirectory: item.isDirectory,
+      editable: item.editable,
+      markdown: item.markdown,
+      image: item.image,
+      size: item.size,
+      mtimeMs: item.mtimeMs,
+    })),
   }
 }
 

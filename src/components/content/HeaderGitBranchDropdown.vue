@@ -231,7 +231,7 @@ onBeforeUnmount(() => window.removeEventListener('pointerdown', onDocumentPointe
 }
 
 .header-git-dirty-dot {
-  @apply h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500;
+  @apply h-1.5 w-1.5 shrink-0 rounded-full bg-zinc-500;
 }
 
 .header-git-menu-wrap {
@@ -269,11 +269,11 @@ onBeforeUnmount(() => window.removeEventListener('pointerdown', onDocumentPointe
 }
 
 .header-git-status {
-  @apply mx-1 my-1 rounded-lg bg-amber-50 px-2 py-1.5 text-xs text-amber-800;
+  @apply mx-1 my-1 rounded-lg bg-zinc-100 px-2 py-1.5 text-xs text-zinc-700;
 }
 
 .header-git-status.is-error {
-  @apply bg-red-50 text-red-700;
+  @apply bg-zinc-100 text-zinc-700;
 }
 
 .header-git-search-wrap {
@@ -355,6 +355,6 @@ onBeforeUnmount(() => window.removeEventListener('pointerdown', onDocumentPointe
 }
 
 .header-git-commits-empty.is-error {
-  @apply text-red-700;
+  @apply text-zinc-700;
 }
 </style>

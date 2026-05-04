@@ -1163,7 +1163,7 @@ onBeforeUnmount(() => {
 }
 
 .review-pane-segmented-button[data-active='true'] {
-  @apply border-sky-200 bg-sky-600 text-white shadow-sm;
+  @apply border-zinc-900 bg-zinc-900 text-white shadow-sm;
 }
 
 .review-pane-segmented-button[data-active='true']::before {
@@ -1179,19 +1179,19 @@ onBeforeUnmount(() => {
 }
 
 .review-pane-run {
-  @apply border-emerald-600 bg-emerald-600 text-white hover:bg-emerald-700;
+  @apply border-zinc-900 bg-zinc-900 text-white hover:bg-black;
 }
 
 .review-pane-refresh {
-  @apply border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100;
+  @apply border-zinc-300 bg-zinc-50 text-zinc-800 hover:bg-zinc-100;
 }
 
 .review-pane-banner {
-  @apply mx-3 mt-2.5 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800;
+  @apply mx-3 mt-2.5 rounded-xl border border-zinc-300 bg-zinc-50 px-3 py-2 text-sm text-zinc-700;
 }
 
 .review-pane-banner.is-error {
-  @apply border-rose-200 bg-rose-50 text-rose-700;
+  @apply border-zinc-300 bg-zinc-50 text-zinc-700;
 }
 
 .review-pane-meta {
@@ -1203,11 +1203,11 @@ onBeforeUnmount(() => {
 }
 
 .review-pane-summary-pill.review-pane-summary-pill-add {
-  @apply bg-emerald-100 text-emerald-700;
+  @apply bg-zinc-100 text-zinc-700;
 }
 
 .review-pane-summary-pill.review-pane-summary-pill-remove {
-  @apply bg-rose-100 text-rose-700;
+  @apply bg-zinc-100 text-zinc-700;
 }
 
 .review-pane-content,
@@ -1271,7 +1271,7 @@ onBeforeUnmount(() => {
 }
 
 .review-pane-resizer:hover::before {
-  @apply bg-sky-500;
+  @apply bg-zinc-500;
 }
 
 .review-pane-file,
@@ -1300,19 +1300,19 @@ onBeforeUnmount(() => {
 }
 
 .review-pane-file-op[data-operation='add'] {
-  @apply bg-emerald-100 text-emerald-800;
+  @apply bg-zinc-100 text-zinc-700;
 }
 
 .review-pane-file-op[data-operation='delete'] {
-  @apply bg-rose-100 text-rose-700;
+  @apply bg-zinc-200 text-zinc-900;
 }
 
 .review-pane-file-op[data-operation='rename'] {
-  @apply bg-sky-100 text-sky-700;
+  @apply bg-zinc-100 text-zinc-700;
 }
 
 .review-pane-file-op[data-operation='update'] {
-  @apply bg-amber-100 text-amber-800;
+  @apply bg-zinc-100 text-zinc-700;
 }
 
 .review-pane-file-path {
@@ -1324,11 +1324,11 @@ onBeforeUnmount(() => {
 }
 
 .review-pane-delta-add {
-  @apply text-emerald-600;
+  @apply text-zinc-700;
 }
 
 .review-pane-delta-remove {
-  @apply text-rose-600;
+  @apply text-zinc-900;
 }
 
 .review-pane-delta-separator {
@@ -1403,25 +1403,25 @@ onBeforeUnmount(() => {
 }
 
 .review-pane-line[data-kind='add'] {
-  @apply bg-emerald-950/60 text-emerald-100;
+  @apply bg-zinc-800 text-zinc-100;
 }
 
 .review-pane-line[data-kind='remove'] {
-  @apply bg-rose-950/60 text-rose-100;
+  @apply bg-zinc-900 text-zinc-300;
 }
 
 .review-pane-line[data-kind='add'] .review-pane-line-marker,
 .review-pane-line[data-kind='add'] .review-pane-line-code {
-  @apply text-emerald-300;
+  @apply text-zinc-100;
 }
 
 .review-pane-line[data-kind='remove'] .review-pane-line-marker,
 .review-pane-line[data-kind='remove'] .review-pane-line-code {
-  @apply text-rose-300;
+  @apply text-zinc-300;
 }
 
 .review-pane-line[data-kind='hunk'] {
-  @apply bg-sky-950/70 text-sky-200;
+  @apply bg-zinc-900 text-zinc-200;
 }
 
 .review-pane-line[data-kind='meta'] {
@@ -1474,7 +1474,7 @@ onBeforeUnmount(() => {
 }
 
 .review-pane-primary-cta {
-  @apply mt-4 border-emerald-600 bg-emerald-600 text-white hover:bg-emerald-700;
+  @apply mt-4 border-zinc-900 bg-zinc-900 text-white hover:bg-black;
 }
 
 .review-pane-sheet-backdrop {

@@ -434,7 +434,7 @@ onMounted(() => {
 }
 
 .skills-sync-error {
-  @apply text-xs text-rose-700 bg-rose-50 border border-rose-200 rounded-md px-2 py-1;
+  @apply text-xs text-zinc-700 bg-zinc-100 border border-zinc-300 rounded-md px-2 py-1;
 }
 
 .skills-sync-actions {
@@ -474,11 +474,11 @@ onMounted(() => {
 }
 
 .skills-hub-toast-success {
-  @apply border border-emerald-200 bg-emerald-50 text-emerald-700;
+  @apply border border-zinc-300 bg-zinc-100 text-zinc-800;
 }
 
 .skills-hub-toast-error {
-  @apply border border-rose-200 bg-rose-50 text-rose-700;
+  @apply border border-zinc-300 bg-zinc-100 text-zinc-800;
 }
 
 .skills-hub-section {
@@ -510,7 +510,7 @@ onMounted(() => {
 }
 
 .skills-hub-error {
-  @apply text-sm text-rose-600 py-4 text-center rounded-lg border border-rose-200 bg-rose-50;
+  @apply text-sm text-zinc-700 py-4 text-center rounded-lg border border-zinc-300 bg-zinc-50;
 }
 
 .skills-hub-empty {
